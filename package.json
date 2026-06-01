@@ -7,7 +7,9 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "build:netlify": "vite build --config vite.config.netlify.ts",
     "preview": "vite preview",
+    "preview:netlify": "vite preview --config vite.config.netlify.ts",
     "lint": "eslint .",
     "format": "prettier --write ."
   },

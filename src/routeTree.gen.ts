@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as _rootNetlifyRouteImport } from './routes/__root.netlify'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SymptomCheckerRouteImport } from './routes/symptom-checker'
 import { Route as ServicesRouteImport } from './routes/services'
@@ -48,6 +49,11 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAppointmentsRouteImport } from './routes/admin.appointments'
 import { Route as NpDocumentVisitIdRouteImport } from './routes/np.document.$visitId'
 
+const _rootNetlifyRoute = _rootNetlifyRouteImport.update({
+  id: '/__root/netlify',
+  path: '/netlify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -254,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/symptom-checker': typeof SymptomCheckerRoute
   '/terms': typeof TermsRoute
+  '/netlify': typeof _rootNetlifyRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -294,6 +301,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/symptom-checker': typeof SymptomCheckerRoute
   '/terms': typeof TermsRoute
+  '/netlify': typeof _rootNetlifyRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -335,6 +343,7 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/symptom-checker': typeof SymptomCheckerRoute
   '/terms': typeof TermsRoute
+  '/__root/netlify': typeof _rootNetlifyRoute
   '/admin/appointments': typeof AdminAppointmentsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -377,6 +386,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/symptom-checker'
     | '/terms'
+    | '/netlify'
     | '/admin/appointments'
     | '/admin/audit'
     | '/admin/dashboard'
@@ -417,6 +427,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/symptom-checker'
     | '/terms'
+    | '/netlify'
     | '/admin/appointments'
     | '/admin/audit'
     | '/admin/dashboard'
@@ -457,6 +468,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/symptom-checker'
     | '/terms'
+    | '/__root/netlify'
     | '/admin/appointments'
     | '/admin/audit'
     | '/admin/dashboard'
@@ -498,12 +510,20 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   SymptomCheckerRoute: typeof SymptomCheckerRoute
   TermsRoute: typeof TermsRoute
+  _rootNetlifyRoute: typeof _rootNetlifyRoute
   LocationsCityRoute: typeof LocationsCityRoute
   LocationsIndexRoute: typeof LocationsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/__root/netlify': {
+      id: '/__root/netlify'
+      path: '/netlify'
+      fullPath: '/netlify'
+      preLoaderRoute: typeof _rootNetlifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terms': {
       id: '/terms'
       path: '/terms'
@@ -857,9 +877,20 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   SymptomCheckerRoute: SymptomCheckerRoute,
   TermsRoute: TermsRoute,
+  _rootNetlifyRoute: _rootNetlifyRoute,
   LocationsCityRoute: LocationsCityRoute,
   LocationsIndexRoute: LocationsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
