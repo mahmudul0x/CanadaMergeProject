@@ -88,104 +88,90 @@ function Hero() {
   const [idx, setIdx] = useState(0);
 
   return (
-    <section className="bg-[#EEF4FB] overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid lg:grid-cols-2 items-stretch">
+    <section className="relative overflow-hidden bg-[#0D1B2A]" style={{ minHeight: "calc(100vh - 105px)" }}>
 
-          {/* ── Left: copy ── */}
-          <div className="flex flex-col justify-center px-6 sm:px-10 lg:pl-14 lg:pr-10 py-12 lg:py-16">
+      {/* ── Full-cover background images ── */}
+      {HERO_SLIDES.map((s, i) => (
+        <img
+          key={s.src}
+          src={s.src}
+          alt={s.alt}
+          className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${i === idx ? "opacity-100" : "opacity-0"}`}
+        />
+      ))}
 
-            <h1 className="font-display font-extrabold text-[36px] sm:text-[44px] lg:text-[48px] leading-[1.1] tracking-tight text-[#0D1B2A]">
-              Expert Pediatric Care.
-              <br />Where &amp; When You
-              <br /><span className="text-[#C0392B]">Need It.</span>
-            </h1>
+      {/* Left gradient overlay — makes text readable, fades to transparent at 55% */}
+      <div className="absolute inset-0 hidden lg:block" style={{
+        background: "linear-gradient(to right, rgba(238,244,251,0.98) 0%, rgba(238,244,251,0.95) 30%, rgba(238,244,251,0.80) 48%, rgba(238,244,251,0.0) 58%)"
+      }} />
+      {/* Mobile full overlay */}
+      <div className="absolute inset-0 lg:hidden bg-[#EEF4FB]/90" />
 
-            <p className="mt-4 text-[15px] text-[#4A6580] leading-relaxed max-w-[440px]">
-              In-clinic, virtual, or in the comfort of your home —<br />
-              we make quality care easy for your family.
-            </p>
+      {/* ── Content overlay ── */}
+      <div className="relative z-10 flex items-center h-full" style={{ minHeight: "calc(100vh - 105px)" }}>
+        <div className="w-full lg:w-[52%] flex flex-col justify-center px-6 sm:px-10 lg:px-14 py-12 lg:py-16">
 
-            {/* Feature icons row */}
-            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
-              {[
-                { icon: CalendarCheck, label: "Same-Day",    sub: "Appointments"        },
-                { icon: HomeIcon,      label: "Home Visits", sub: "Across GTA"           },
-                { icon: Video,         label: "Telemedicine",sub: "7 Days a Week"        },
-                { icon: Heart,         label: "Trusted by",  sub: "Thousands of Parents" },
-              ].map((f) => (
-                <div key={f.label} className="flex flex-col items-center text-center w-[72px]">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-[#D6E4F0] shadow-sm">
-                    <f.icon className="h-5 w-5 text-[#1B6CA8]" />
-                  </span>
-                  <p className="mt-1.5 text-[11px] font-bold text-[#0D1B2A] leading-tight">{f.label}</p>
-                  <p className="text-[10px] text-[#4A6580] leading-tight">{f.sub}</p>
-                </div>
-              ))}
-            </div>
+          <h1 className="font-display font-extrabold text-[36px] sm:text-[44px] lg:text-[52px] leading-[1.08] tracking-tight text-[#0D1B2A]">
+            Expert Pediatric Care.
+            <br />Where &amp; When You
+            <br /><span className="text-[#C0392B]">Need It.</span>
+          </h1>
 
-            {/* CTA buttons */}
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link to="/book"
-                className="inline-flex items-center gap-2 bg-[#0D1B2A] hover:bg-[#1B3A5A] text-white text-[14px] font-bold px-6 py-3 rounded-full shadow-md transition-all">
-                Book a Visit <CalendarCheck className="h-4 w-4" />
-              </Link>
-              <Link to="/symptom-checker"
-                className="inline-flex items-center gap-2 border-2 border-[#0D1B2A] text-[#0D1B2A] text-[14px] font-bold px-6 py-3 rounded-full hover:bg-[#0D1B2A] hover:text-white transition-all">
-                Virtual Visit <Video className="h-4 w-4" />
-              </Link>
-            </div>
+          <p className="mt-4 text-[15px] text-[#4A6580] leading-relaxed max-w-[440px]">
+            In-clinic, virtual, or in the comfort of your home —<br />
+            we make quality care easy for your family.
+          </p>
 
-            {/* Trust badges */}
-            <div className="mt-6 flex items-center gap-2 text-[12px] font-semibold text-[#2D6A4F]">
-              <ShieldCheck className="h-4 w-4 text-[#2ECC8B]" />
-              <span>PHIPA Compliant</span>
-              <span className="text-[#B0BEC5] mx-1">•</span>
-              <span>Secure</span>
-              <span className="text-[#B0BEC5] mx-1">•</span>
-              <span>Trusted</span>
-            </div>
-          </div>
-
-          {/* ── Right: photo (flush, no rounding) ── */}
-          <div className="relative hidden lg:block min-h-[560px]">
-            {HERO_SLIDES.map((s, i) => (
-              <img
-                key={s.src}
-                src={s.src}
-                alt={s.alt}
-                className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${i === idx ? "opacity-100" : "opacity-0"}`}
-              />
-            ))}
-
-            {/* Slide dots — bottom left of photo */}
-            <div className="absolute bottom-5 left-5 flex gap-1.5 z-10">
-              {HERO_SLIDES.map((_, i) => (
-                <button key={i} onClick={() => setIdx(i)}
-                  className={`h-1.5 rounded-full transition-all ${i === idx ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/80"}`} />
-              ))}
-            </div>
-
-            {/* AI Symptom Checker card — bottom right */}
-            <div className="absolute bottom-6 right-5 bg-white rounded-2xl shadow-2xl p-4 w-52 z-10">
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[#EEF3FF]">
-                  <Brain className="h-4 w-4 text-[#5B7FE8]" />
+          {/* Feature icons row */}
+          <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
+            {[
+              { icon: CalendarCheck, label: "Same-Day",    sub: "Appointments"        },
+              { icon: HomeIcon,      label: "Home Visits", sub: "Across GTA"           },
+              { icon: Video,         label: "Telemedicine",sub: "7 Days a Week"        },
+              { icon: Heart,         label: "Trusted by",  sub: "Thousands of Parents" },
+            ].map((f) => (
+              <div key={f.label} className="flex flex-col items-center text-center w-[72px]">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-[#D6E4F0] shadow-sm">
+                  <f.icon className="h-5 w-5 text-[#1B6CA8]" />
                 </span>
-                <p className="text-[12px] font-bold text-[#0D1B2A]">AI Symptom Checker</p>
+                <p className="mt-1.5 text-[11px] font-bold text-[#0D1B2A] leading-tight">{f.label}</p>
+                <p className="text-[10px] text-[#4A6580] leading-tight">{f.sub}</p>
               </div>
-              <p className="text-[11px] text-[#4A6580] leading-snug mb-3">
-                Not sure what's wrong?<br />Get instant guidance.
-              </p>
-              <Link to="/symptom-checker"
-                className="block w-full text-center bg-[#EEF3FF] text-[#5B7FE8] text-[11px] font-bold py-2 rounded-full hover:bg-[#5B7FE8] hover:text-white transition-colors">
-                Check Symptoms
-              </Link>
-            </div>
+            ))}
           </div>
 
+          {/* CTA buttons */}
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link to="/book"
+              className="inline-flex items-center gap-2 bg-[#0D1B2A] hover:bg-[#1B3A5A] text-white text-[14px] font-bold px-6 py-3 rounded-full shadow-md transition-all">
+              Book a Visit <CalendarCheck className="h-4 w-4" />
+            </Link>
+            <Link to="/symptom-checker"
+              className="inline-flex items-center gap-2 border-2 border-[#0D1B2A] text-[#0D1B2A] text-[14px] font-bold px-6 py-3 rounded-full hover:bg-[#0D1B2A] hover:text-white transition-all">
+              Virtual Visit <Video className="h-4 w-4" />
+            </Link>
+          </div>
+
+          {/* Trust badges */}
+          <div className="mt-6 flex items-center gap-2 text-[12px] font-semibold text-[#2D6A4F]">
+            <ShieldCheck className="h-4 w-4 text-[#2ECC8B]" />
+            <span>PHIPA Compliant</span>
+            <span className="text-[#B0BEC5] mx-1">•</span>
+            <span>Secure</span>
+            <span className="text-[#B0BEC5] mx-1">•</span>
+            <span>Trusted</span>
+          </div>
         </div>
       </div>
+
+      {/* ── Slide dots bottom left ── */}
+      <div className="absolute bottom-5 left-6 lg:left-14 z-20 flex gap-1.5">
+        {HERO_SLIDES.map((_, i) => (
+          <button key={i} onClick={() => setIdx(i)}
+            className={`h-1.5 rounded-full transition-all ${i === idx ? "w-6 bg-[#1B6CA8]" : "w-2 bg-[#1B6CA8]/30 hover:bg-[#1B6CA8]/60"}`} />
+        ))}
+      </div>
+
     </section>
   );
 }
