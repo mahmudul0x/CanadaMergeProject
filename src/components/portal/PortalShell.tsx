@@ -107,18 +107,6 @@ export function PortalShell({
               {brand}
             </div>
           </div>
-          <button
-            onClick={() => setCollapsed((v) => !v)}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`hidden lg:inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg transition-colors
-              ${isDark ? "text-white/40 hover:bg-white/8 hover:text-white" : "text-[oklch(0.55_0.05_250)] hover:bg-[oklch(0.94_0.05_240)] hover:text-primary"}`}
-          >
-            {collapsed ? (
-              <ChevronsRight className="h-4 w-4" />
-            ) : (
-              <ChevronsLeft className="h-4 w-4" />
-            )}
-          </button>
         </div>
 
         {/* Sub-brand / User info */}
