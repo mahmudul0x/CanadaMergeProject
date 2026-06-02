@@ -134,7 +134,7 @@ export function PortalShell({
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 space-y-4 scrollbar-thin">
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2 space-y-4 scrollbar-none">
           {grouped.map((g, gi) => (
             <div key={gi}>
               {g.section && !collapsed && (
