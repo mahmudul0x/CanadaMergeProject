@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
+
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -5,8 +7,6 @@
 @custom-variant dark (&:is(.dark *));
 
 /* Pediatric Urgent Care — Design System */
-
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap");
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);

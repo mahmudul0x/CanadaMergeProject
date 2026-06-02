@@ -1,3 +1,4 @@
+// @refresh reset
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ChevronLeft, ChevronRight, MapPin, Navigation, Play, FileEdit, CheckCircle2, Star,

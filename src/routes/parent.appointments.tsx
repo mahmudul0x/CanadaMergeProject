@@ -1,3 +1,4 @@
+// @refresh reset
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Calendar, MapPin } from "lucide-react";
 import { Avatar, Badge, Card, PageHeader } from "@/components/portal/PortalShell";

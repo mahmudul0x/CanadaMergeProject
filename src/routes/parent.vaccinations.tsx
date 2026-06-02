@@ -1,3 +1,4 @@
+// @refresh reset
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { Download, Syringe } from "lucide-react";

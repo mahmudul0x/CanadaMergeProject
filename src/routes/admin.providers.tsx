@@ -1,3 +1,4 @@
+// @refresh reset
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Award, Download, MapPin, Plus, Search, Star, Stethoscope, TrendingUp, Users } from "lucide-react";

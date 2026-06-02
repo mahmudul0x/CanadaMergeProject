@@ -1,3 +1,4 @@
+// @refresh reset
 import { createFileRoute } from "@tanstack/react-router";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Star } from "lucide-react";

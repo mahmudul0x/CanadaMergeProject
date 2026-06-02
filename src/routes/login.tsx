@@ -1,3 +1,4 @@
+// @refresh reset
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Mail, Lock, ArrowRight, Stethoscope, Users, Shield } from "lucide-react";

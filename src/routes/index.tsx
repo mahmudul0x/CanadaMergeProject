@@ -1,314 +1,247 @@
+// @refresh reset
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useEffect } from "react";
 import {
-  ArrowRight,
-  Brain,
-  CalendarCheck,
-  ChevronDown,
-  ClipboardCheck,
-  CreditCard,
-  Heart,
-  Home as HomeIcon,
-  MapPin,
-  Phone,
-  Star,
-  Syringe,
-  Thermometer,
-  UserCheck,
-  Video,
-  Check,
-  ShieldCheck,
-  Clock,
+  AlertTriangle, ArrowRight, Award, BadgeCheck, Brain, CalendarCheck,
+  Check, ChevronDown, ChevronLeft, ChevronRight, Clock, Facebook,
+  Globe, Heart, Home as HomeIcon, Instagram, Lock, Mail, MapPin,
+  Phone, Quote, ShieldCheck, Smartphone, Sparkles, Star,
+  Stethoscope, Thermometer, TrendingUp, UserCheck, Video, X, Zap,
 } from "lucide-react";
-import { Award, BadgeCheck, Lock, Quote, Sparkles, FileText, HelpCircle, Mail } from "lucide-react";
 import heroImage from "@/assets/hero-np-home-visit.jpg";
 import heroCheckup from "@/assets/hero-np-checkup.jpg";
 import heroToddler from "@/assets/hero-np-toddler.jpg";
 import heroVaccine from "@/assets/hero-np-vaccine.jpg";
-import serviceFeaturedImage from "@/assets/service-featured-sick-visit.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pediatric Urgent Care™ — Expert Pediatric Care at Your Door | Ontario" },
-      {
-        name: "description",
-        content:
-          "Board-certified Nurse Practitioners visit your home across Ontario within hours. Same-day pediatric sick visits, vaccinations, and follow-ups. PHIPA compliant.",
-      },
-      { property: "og:title", content: "Pediatric Urgent Care™ — Expert Pediatric Care at Your Door" },
-      {
-        property: "og:description",
-        content: "Ontario's #1 pediatric home visit service. Same-day appointments. NP-led care. PHIPA compliant.",
-      },
-      {
-        property: "og:image",
-        content: heroImage,
-      },
+      { title: "Pediatric Urgent Care™ — Expert Care. At Your Door." },
+      { name: "description", content: "Board-certified Nurse Practitioners visit your home across Ontario. Same-day pediatric sick visits, vaccinations, and follow-ups. PHIPA compliant." },
     ],
   }),
   component: HomePage,
 });
 
+/* ── constants ── */
+const CITIES_LIST = ["Milton", "Oakville", "Hamilton", "Halton Hills", "Mississauga", "Burlington", "Brampton"];
+
+/* ════════════════════════════════════════════════════════
+   PAGE
+════════════════════════════════════════════════════════ */
 function HomePage() {
   return (
-    <>
+    <div className="font-sans text-[#0D1B2A] bg-white">
+      <SeasonalAlert />
       <Hero />
-      <Ticker />
+      <TrustBar />
       <HowItWorks />
-      <Services />
-      <Locations />
-      <SocialProof />
-      <PricingCalculator />
-      <WhyChooseUs />
-      <FAQ />
-      <FinalCTA />
-    </>
+      <CareOptions />
+      <TelemedicineSection />
+      <LocationsSection />
+      <WhyTrustUs />
+      <TrustBadges />
+      <Testimonials />
+      <BlogPreview />
+      <FAQSection />
+      <ParentPortalSection />
+      <BottomCTASection />
+    </div>
   );
 }
 
-/* ──────────────────────────── HERO ──────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   TOP BANNER (navy bar)
+════════════════════════════════════════════════════════ */
+function TopBanner() {
+  return (
+    <div className="bg-[#0D1B2A] text-white text-xs font-medium">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-9">
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-[#2ECC8B]" />PHIPA &amp; PIPEDA Compliant</span>
+          <span className="hidden sm:inline text-white/30">|</span>
+          <span className="hidden sm:inline text-white/70">Trusted Pediatric Care Across Ontario</span>
+        </div>
+        <div className="flex items-center gap-5">
+          <a href="/careers" className="text-white/70 hover:text-white transition-colors">Careers</a>
+          <a href="#" className="text-white/70 hover:text-white transition-colors">Français</a>
+          <Link to="/login" className="flex items-center gap-1.5 bg-[#1B6CA8] hover:bg-[#1558891] text-white px-3 py-1 rounded-full transition-colors">
+            <UserCheck className="h-3 w-3" /> Patient Portal Login
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   HERO
+════════════════════════════════════════════════════════ */
+const HERO_SLIDES = [
+  { src: heroImage,    alt: "Nurse practitioner with child at home",       label: "In-Home Sick Visits",    sub: "Fever, infections & more"       },
+  { src: heroCheckup,  alt: "Well-child checkup in bright living room",    label: "Well-Child Checkups",    sub: "Growth & development"            },
+  { src: heroToddler,  alt: "Nurse practitioner examining toddler",        label: "Gentle, Kid-Friendly Care", sub: "Comfort of home"              },
+  { src: heroVaccine,  alt: "Nurse practitioner giving vaccine to child",  label: "Routine Vaccinations",   sub: "On schedule, at your door"      },
+];
 
 function Hero() {
+  const [idx, setIdx] = useState(0);
+
   return (
-    <section
-      className="relative overflow-hidden"
-      aria-label="Pediatric Urgent Care — home visits across Ontario"
-    >
-      {/* Full-bleed background carousel */}
-      <HeroCarousel />
+    <section className="bg-[#EEF4FB] overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-2 items-stretch">
 
-      {/* Dark gradient for legibility */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-10"
-        style={{
-          background:
-            "linear-gradient(100deg, rgba(8,20,40,0.88) 0%, rgba(8,20,40,0.72) 38%, rgba(8,20,40,0.35) 65%, rgba(8,20,40,0.15) 100%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-40 z-10 bg-gradient-to-t from-black/55 to-transparent"
-      />
+          {/* ── Left: copy ── */}
+          <div className="flex flex-col justify-center px-6 sm:px-10 lg:pl-14 lg:pr-10 py-12 lg:py-16">
 
-      <div className="container-page relative z-20 grid grid-cols-1 lg:grid-cols-12 items-center gap-10 pt-28 pb-24 lg:pt-36 lg:pb-32 min-h-[88vh]">
-        {/* Copy */}
-        <div className="lg:col-span-7 animate-hero-text text-white">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white px-3.5 py-1.5 text-[12px] font-semibold tracking-wide uppercase shadow-soft border border-[color:var(--border)]">
-            <span aria-hidden className="text-maple text-base leading-none">🍁</span>
-            <span className="text-secondary-ink">Ontario Pediatric Home Visit Service</span>
-          </span>
+            <h1 className="font-display font-extrabold text-[36px] sm:text-[44px] lg:text-[48px] leading-[1.1] tracking-tight text-[#0D1B2A]">
+              Expert Pediatric Care.
+              <br />Where &amp; When You
+              <br /><span className="text-[#C0392B]">Need It.</span>
+            </h1>
 
-          <h1 className="mt-6 font-display font-bold text-white text-[40px] sm:text-[52px] lg:text-[68px] leading-[1.05] tracking-[-0.025em] drop-shadow-[0_2px_24px_rgba(0,0,0,0.35)]">
-            Expert Pediatric Care,
-            <span className="block mt-1">
-              <span className="relative inline-block">
-                <span className="relative z-10" style={{ color: "#7CE8B6" }}>Right at Your Door.</span>
-                <span
-                  aria-hidden
-                  className="absolute left-0 right-0 bottom-1 h-3 -z-0"
-                  style={{ background: "color-mix(in oklab, #2ECC8B 35%, transparent)" }}
-                />
-              </span>
-            </span>
-          </h1>
+            <p className="mt-4 text-[15px] text-[#4A6580] leading-relaxed max-w-[440px]">
+              In-clinic, virtual, or in the comfort of your home —<br />
+              we make quality care easy for your family.
+            </p>
 
-          <p className="mt-6 max-w-[580px] text-[17px] lg:text-[19px] leading-[1.65] text-white/90">
-            Board-certified Nurse Practitioners arrive at your home within hours — fully equipped to assess,
-            diagnose, and treat your child. No waiting rooms. No stress. Just calm, expert care.
-          </p>
+            {/* Feature icons row */}
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
+              {[
+                { icon: CalendarCheck, label: "Same-Day",    sub: "Appointments"        },
+                { icon: HomeIcon,      label: "Home Visits", sub: "Across GTA"           },
+                { icon: Video,         label: "Telemedicine",sub: "7 Days a Week"        },
+                { icon: Heart,         label: "Trusted by",  sub: "Thousands of Parents" },
+              ].map((f) => (
+                <div key={f.label} className="flex flex-col items-center text-center w-[72px]">
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-[#D6E4F0] shadow-sm">
+                    <f.icon className="h-5 w-5 text-[#1B6CA8]" />
+                  </span>
+                  <p className="mt-1.5 text-[11px] font-bold text-[#0D1B2A] leading-tight">{f.label}</p>
+                  <p className="text-[10px] text-[#4A6580] leading-tight">{f.sub}</p>
+                </div>
+              ))}
+            </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-            <Link
-              to="/book"
-              className="inline-flex h-[56px] items-center justify-center gap-2 rounded-full bg-primary px-7 text-[16px] font-semibold text-white shadow-lift transition-transform hover:scale-[1.02] btn-press"
-            >
-              Book a Home Visit <ArrowRight className="h-5 w-5" />
-            </Link>
-            <Link
-              to="/symptom-checker"
-              className="inline-flex h-[56px] items-center justify-center gap-2 rounded-full border border-white/40 bg-white/10 backdrop-blur px-7 text-[16px] font-semibold text-white hover:bg-white hover:text-foreground transition-colors btn-press"
-            >
-              Check Symptoms Free
-            </Link>
+            {/* CTA buttons */}
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link to="/book"
+                className="inline-flex items-center gap-2 bg-[#0D1B2A] hover:bg-[#1B3A5A] text-white text-[14px] font-bold px-6 py-3 rounded-full shadow-md transition-all">
+                Book a Visit <CalendarCheck className="h-4 w-4" />
+              </Link>
+              <Link to="/symptom-checker"
+                className="inline-flex items-center gap-2 border-2 border-[#0D1B2A] text-[#0D1B2A] text-[14px] font-bold px-6 py-3 rounded-full hover:bg-[#0D1B2A] hover:text-white transition-all">
+                Virtual Visit <Video className="h-4 w-4" />
+              </Link>
+            </div>
+
+            {/* Trust badges */}
+            <div className="mt-6 flex items-center gap-2 text-[12px] font-semibold text-[#2D6A4F]">
+              <ShieldCheck className="h-4 w-4 text-[#2ECC8B]" />
+              <span>PHIPA Compliant</span>
+              <span className="text-[#B0BEC5] mx-1">•</span>
+              <span>Secure</span>
+              <span className="text-[#B0BEC5] mx-1">•</span>
+              <span>Trusted</span>
+            </div>
           </div>
 
-          {/* Trust signals */}
-          <dl className="mt-10 grid grid-cols-3 gap-6 max-w-[520px] border-t border-white/25 pt-6">
-            <div>
-              <dt className="text-xs uppercase tracking-wider text-white/70">Rating</dt>
-              <dd className="mt-1 flex items-baseline gap-1.5">
-                <span className="font-display text-2xl font-bold text-white">4.9</span>
-                <Star className="h-4 w-4 fill-current" style={{ color: "#F5A623" }} />
-              </dd>
+          {/* ── Right: photo (flush, no rounding) ── */}
+          <div className="relative hidden lg:block min-h-[560px]">
+            {HERO_SLIDES.map((s, i) => (
+              <img
+                key={s.src}
+                src={s.src}
+                alt={s.alt}
+                className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700 ${i === idx ? "opacity-100" : "opacity-0"}`}
+              />
+            ))}
+
+            {/* Slide dots — bottom left of photo */}
+            <div className="absolute bottom-5 left-5 flex gap-1.5 z-10">
+              {HERO_SLIDES.map((_, i) => (
+                <button key={i} onClick={() => setIdx(i)}
+                  className={`h-1.5 rounded-full transition-all ${i === idx ? "w-6 bg-white" : "w-2 bg-white/50 hover:bg-white/80"}`} />
+              ))}
             </div>
-            <div>
-              <dt className="text-xs uppercase tracking-wider text-white/70">Families</dt>
-              <dd className="mt-1 font-display text-2xl font-bold text-white">2,400+</dd>
+
+            {/* AI Symptom Checker card — bottom right */}
+            <div className="absolute bottom-6 right-5 bg-white rounded-2xl shadow-2xl p-4 w-52 z-10">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[#EEF3FF]">
+                  <Brain className="h-4 w-4 text-[#5B7FE8]" />
+                </span>
+                <p className="text-[12px] font-bold text-[#0D1B2A]">AI Symptom Checker</p>
+              </div>
+              <p className="text-[11px] text-[#4A6580] leading-snug mb-3">
+                Not sure what's wrong?<br />Get instant guidance.
+              </p>
+              <Link to="/symptom-checker"
+                className="block w-full text-center bg-[#EEF3FF] text-[#5B7FE8] text-[11px] font-bold py-2 rounded-full hover:bg-[#5B7FE8] hover:text-white transition-colors">
+                Check Symptoms
+              </Link>
             </div>
-            <div>
-              <dt className="text-xs uppercase tracking-wider text-white/70">Ontario Cities</dt>
-              <dd className="mt-1 font-display text-2xl font-bold text-white">7</dd>
-            </div>
-          </dl>
+          </div>
+
         </div>
       </div>
     </section>
   );
 }
 
-/* ──────────────────────────── HERO CAROUSEL ──────────────────────────── */
-
-function HeroCarousel() {
-  const slides = [
-    {
-      src: heroImage,
-      alt: "Pediatric nurse practitioner caring for a toddler during a home visit",
-      caption: "In-Home Sick Visits",
-      sub: "Fever, infections & more",
-    },
-    {
-      src: heroCheckup,
-      alt: "Nurse practitioner doing a well-child checkup in a bright living room",
-      caption: "Well-Child Checkups",
-      sub: "Growth & development",
-    },
-    {
-      src: heroToddler,
-      alt: "Male nurse practitioner examining a toddler in a cozy bedroom",
-      caption: "Gentle, Kid-Friendly Care",
-      sub: "Comfort of home",
-    },
-    {
-      src: heroVaccine,
-      alt: "Nurse practitioner administering a vaccine to a smiling child at home",
-      caption: "Routine Vaccinations",
-      sub: "On schedule, at your door",
-    },
-  ];
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 5500);
-    return () => clearInterval(t);
-  }, [slides.length]);
-
-  const go = (n: number) => setIdx((n + slides.length) % slides.length);
-
+/* ════════════════════════════════════════════════════════
+   TRUST BAR (stats strip)
+════════════════════════════════════════════════════════ */
+function TrustBar() {
   return (
-    <div className="absolute inset-0 z-0 bg-foreground">
-      {slides.map((s, i) => (
-        <img
-          key={s.src}
-          src={s.src}
-          alt={s.alt}
-          width={1088}
-          height={1344}
-          fetchPriority={i === 0 ? "high" : "low"}
-          loading={i === 0 ? undefined : "lazy"}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[1400ms] ease-out ${
-            i === idx ? "opacity-100 animate-kenburns" : "opacity-0"
-          }`}
-          style={{ objectPosition: "center 35%" }}
-        />
-      ))}
-
-      {/* Prev / Next */}
-      <button
-        type="button"
-        aria-label="Previous slide"
-        onClick={() => go(idx - 1)}
-        className="absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 z-30 h-11 w-11 rounded-full bg-white/15 hover:bg-white/95 hover:text-foreground text-white border border-white/30 backdrop-blur flex items-center justify-center transition"
-      >
-        <ArrowRight className="h-4 w-4 rotate-180" />
-      </button>
-      <button
-        type="button"
-        aria-label="Next slide"
-        onClick={() => go(idx + 1)}
-        className="absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 z-30 h-11 w-11 rounded-full bg-white/15 hover:bg-white/95 hover:text-foreground text-white border border-white/30 backdrop-blur flex items-center justify-center transition"
-      >
-        <ArrowRight className="h-4 w-4" />
-      </button>
-
-      {/* Slide caption + dots */}
-      <div className="absolute bottom-6 right-6 z-30 hidden md:flex flex-col items-end gap-3 text-white">
-        <div className="relative h-10 min-w-[220px] text-right">
-          {slides.map((s, i) => (
-            <div
-              key={s.caption}
-              className={`absolute right-0 top-0 transition-all duration-700 ${
-                i === idx ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-              }`}
-            >
-              <div className="text-[11px] uppercase tracking-[0.2em] font-semibold opacity-80">
-                {s.sub}
-              </div>
-              <div className="font-display text-lg font-bold leading-tight">{s.caption}</div>
+    <div className="bg-white border-y border-[#D6E4F0]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          {[
+            { value: "2,400+", label: "Families Served" },
+            { value: "4.9 ★",  label: "Google Rating",  accent: true },
+            { value: "48+",    label: "NPs on Call" },
+            { value: "<3 hr",  label: "Avg Arrival Time" },
+          ].map((s) => (
+            <div key={s.label}>
+              <p className={`font-display font-extrabold text-2xl ${s.accent ? "text-[#F5A623]" : "text-[#1B6CA8]"}`}>{s.value}</p>
+              <p className="text-xs text-[#4A6580] font-medium mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-2">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Go to slide ${i + 1}`}
-              onClick={() => go(i)}
-              className={`h-1.5 rounded-full transition-all ${
-                i === idx ? "w-8 bg-white" : "w-2.5 bg-white/50 hover:bg-white/80"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Dots on mobile (bottom center) */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex md:hidden items-center gap-2">
-        {slides.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            aria-label={`Go to slide ${i + 1}`}
-            onClick={() => go(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === idx ? "w-6 bg-white" : "w-2 bg-white/50"
-            }`}
-          />
-        ))}
       </div>
     </div>
   );
 }
 
-/* ──────────────────────────── TICKER ──────────────────────────── */
-
-function Ticker() {
-  const items = [
-    "✦ PHIPA Compliant",
-    "Board-Certified NPs",
-    "Same-Day Availability",
-    "Serving Milton · Halton · Hamilton · Oakville · Mississauga · Burlington · Brampton",
-    "4.9★ Google Rating",
-    "2,400+ Families Served",
-    "Ontario's #1 Pediatric Home Visit Service",
-  ];
-  const content = items.join("  ·  ");
+/* ════════════════════════════════════════════════════════
+   SEASONAL ALERT BANNER  (#10)
+════════════════════════════════════════════════════════ */
+function SeasonalAlert() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
   return (
-    <div className="bg-primary text-white overflow-hidden" style={{ height: 48 }}>
-      <div className="flex h-full items-center whitespace-nowrap">
-        <div className="flex animate-marquee">
-          <span className="px-6 text-sm font-medium tracking-wide">{content}</span>
-          <span className="px-6 text-sm font-medium tracking-wide" aria-hidden>{content}</span>
+    <div className="bg-[#FFF3CD] border-b border-[#F5C842]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2.5 flex-1">
+          <AlertTriangle className="h-4 w-4 text-[#B45309] shrink-0" />
+          <p className="text-[13px] font-semibold text-[#7C4A00]">
+            <strong>Flu Season Alert:</strong> High demand expected across GTA — book early to secure same-day availability.
+            <Link to="/book" className="ml-2 underline hover:no-underline font-bold text-[#1B6CA8]">Book now →</Link>
+          </p>
         </div>
+        <button onClick={() => setVisible(false)} className="shrink-0 text-[#B45309] hover:text-[#7C4A00] transition-colors">
+          <X className="h-4 w-4" />
+        </button>
       </div>
     </div>
   );
 }
 
-/* ──────────────────────────── HOW IT WORKS ──────────────────────────── */
-
+/* ════════════════════════════════════════════════════════
+   HOW IT WORKS  (#3)
+════════════════════════════════════════════════════════ */
 function HowItWorks() {
   const steps = [
     {
@@ -317,550 +250,416 @@ function HowItWorks() {
       iconBg: "#E8F1FA",
       iconColor: "#1B6CA8",
       title: "Book in 2 Minutes",
-      body: "Choose your city, visit type, and preferred time slot online. Pay securely. Done.",
-      tag: "Available 7am–10pm daily",
+      body: "Choose your city, visit type, and preferred time slot online. Pay securely. Confirmation in under 15 minutes.",
+      tag: "Available 7AM – 10PM daily",
     },
     {
       num: "02",
       icon: UserCheck,
-      iconBg: "#D1FAE5",
-      iconColor: "#2ECC8B",
+      iconBg: "#ECFDF5",
+      iconColor: "#047857",
       title: "NP Confirmed Instantly",
-      body: "A certified, insured Nurse Practitioner is assigned and you receive a confirmation with their profile.",
+      body: "A certified, insured Nurse Practitioner is assigned and you receive their profile with live ETA tracking.",
       tag: "Usually within 15 minutes",
     },
     {
       num: "03",
       icon: HomeIcon,
-      iconBg: "#E8F1FA",
+      iconBg: "#EEF3FF",
       iconColor: "#1B6CA8",
       title: "Care at Your Door",
-      body: "Your NP arrives fully equipped. Assessment, diagnosis, treatment plan — all at home.",
+      body: "Your NP arrives fully equipped. Assessment, diagnosis, and treatment plan — all in the comfort of your home.",
       tag: "Avg arrival: 2–4 hours",
     },
   ];
+
   return (
-    <Section bg="#FFFFFF">
-      <SectionHeading label="THE PROCESS" title="Care in 3 Simple Steps" subtitle="From booking to bedside — we make it effortless." />
-      <div className="mt-14 grid gap-6 md:grid-cols-3 relative">
-        <div className="hidden md:block absolute top-[88px] left-[16%] right-[16%] border-t-2 border-dashed border-border" aria-hidden />
-        {steps.map((s) => (
-          <article
-            key={s.num}
-            className="relative rounded-[20px] border border-border bg-white p-10 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary hover:shadow-lift"
-          >
-            <span className="absolute right-6 top-4 font-display font-extrabold text-[80px] leading-none select-none" style={{ color: "#E8F1FA" }}>
-              {s.num}
-            </span>
-            <span
-              className="relative inline-flex h-14 w-14 items-center justify-center rounded-full"
-              style={{ backgroundColor: s.iconBg }}
-            >
-              <s.icon className="h-6 w-6" style={{ color: s.iconColor }} />
-            </span>
-            <h3 className="relative mt-6 font-display font-bold text-2xl">{s.title}</h3>
-            <p className="relative mt-3 text-[15px] text-secondary-ink leading-relaxed">{s.body}</p>
-            <p className="relative mt-5 inline-flex items-center gap-1.5 rounded-full bg-[#F4F8FF] px-3 py-1 text-xs font-semibold text-primary">
-              {s.tag}
-            </p>
-          </article>
-        ))}
+    <section className="bg-[#F7FAFE] py-14 border-t border-[#EEF2F7]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-10">
+          <span className="inline-flex items-center gap-1.5 bg-[#E8F1FA] text-[#1B6CA8] text-[11px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full mb-3">
+            <Zap className="h-3 w-3" /> Simple Process
+          </span>
+          <h2 className="font-display font-bold text-[24px] sm:text-[30px] text-[#0D1B2A]">
+            Expert Care in 3 Simple Steps
+          </h2>
+          <p className="mt-2 text-[14px] text-[#4A6580] max-w-xl mx-auto">
+            From booking to bedside in hours — no waiting rooms, no stress.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 relative">
+          {/* Connector line */}
+          <div className="hidden md:block absolute top-10 left-[calc(16.7%+24px)] right-[calc(16.7%+24px)] h-px border-t-2 border-dashed border-[#C8D8EC]" />
+
+          {steps.map((s, i) => (
+            <div key={s.num} className="bg-white rounded-2xl border border-[#E8EFF7] p-7 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 relative">
+              <span className="absolute top-5 right-5 font-display font-extrabold text-[56px] leading-none text-[#EEF4FB] select-none">{s.num}</span>
+              <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: s.iconBg }}>
+                <s.icon className="h-7 w-7" style={{ color: s.iconColor }} />
+              </span>
+              <h3 className="mt-5 font-display font-bold text-[17px] text-[#0D1B2A]">{s.title}</h3>
+              <p className="mt-2 text-[13px] text-[#4A6580] leading-relaxed">{s.body}</p>
+              <span className="mt-4 inline-flex items-center gap-1.5 bg-[#EEF4FB] text-[#1B6CA8] text-[11px] font-bold px-3 py-1.5 rounded-full">
+                <Check className="h-3 w-3" /> {s.tag}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link to="/book" className="inline-flex items-center gap-2 bg-[#1B6CA8] text-white font-bold px-7 py-3 rounded-full hover:bg-[#155892] transition-colors shadow-md">
+            Book Your Visit Now <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
-    </Section>
+    </section>
   );
 }
 
-/* ──────────────────────────── SERVICES ──────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   CARE OPTIONS CAROUSEL
+════════════════════════════════════════════════════════ */
+const CARE_OPTIONS = [
+  { icon: Stethoscope, color: "#1B6CA8", bg: "#E8F1FA", title: "Pediatrics",           desc: "Complete medical care for infants, children & adolescents.", badge: null },
+  { icon: UserCheck,   color: "#047857", bg: "#ECFDF5", title: "Walk-In Care",          desc: "No appointment? Walk in for quick, convenient care.",         badge: null },
+  { icon: Thermometer, color: "#D52B1E", bg: "#FEF0EE", title: "Pediatric Urgent Care", desc: "Urgent care for non-life threatening illnesses & injuries.",   badge: null },
+  { icon: Video,       color: "#6D28D9", bg: "#F0EEFF", title: "Telemedicine",          desc: "See a provider from the comfort of your home.",               badge: null },
+  { icon: HomeIcon,    color: "#B45309", bg: "#FEF3C7", title: "Home Visits",           desc: "We come to you. Care for your child at home.",                badge: "NEW" },
+];
 
-function Services() {
-  const featured = {
-    icon: Thermometer,
-    tag: "Most booked",
-    title: "Sick Visits",
-    desc: "Fevers, ear infections, strep, rashes, stomach bugs — assessed, diagnosed, and treated at home by a board-certified Nurse Practitioner. Prescriptions sent directly to your pharmacy.",
-    price: "From $149",
-    duration: "45–60 min visit",
-    features: ["Same-day availability", "On-site rapid testing", "E-prescriptions included", "Full visit summary"],
-  };
-  const services = [
-    { icon: Syringe, accent: "#047857", accentBg: "#ECFDF5", title: "Vaccinations", desc: "All routine childhood vaccines on the Ontario schedule, delivered at home.", price: "From $99", duration: "20 min" },
-    { icon: ClipboardCheck, accent: "#1D4ED8", accentBg: "#EFF6FF", title: "Follow-up Care", desc: "Post-illness and post-hospital monitoring with structured NP check-ins.", price: "From $119", duration: "30 min" },
-    { icon: Heart, accent: "#BE185D", accentBg: "#FDF2F8", title: "Well-child Checkups", desc: "Annual growth, nutrition, and developmental assessments with a written report.", price: "From $179", duration: "60 min" },
-    { icon: Video, accent: "#6D28D9", accentBg: "#F5F3FF", title: "Telemedicine", desc: "Secure video consult for non-emergency concerns from any device, day or evening.", price: "From $49", duration: "15 min" },
-    { icon: Brain, accent: "#B91C1C", accentBg: "#FEF2F2", title: "Developmental Assessment", desc: "Milestone screening, behavioural review, and pediatric specialist referrals.", price: "From $199", duration: "75 min" },
-  ];
+function CareOptions() {
+  const [start, setStart] = useState(0);
+  const perPage = 5;
+  const canPrev = start > 0;
+  const canNext = start + perPage < CARE_OPTIONS.length;
+
   return (
-    <Section bg="#F4F8FF">
-      <div className="flex flex-col items-start gap-8 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-2xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" /> What we offer
-          </span>
-          <h2 className="mt-5 font-display text-4xl font-bold leading-[1.05] text-foreground sm:text-5xl">
-            Pediatric care, <span className="text-primary">end to end</span>.
+    <section className="bg-white py-12 border-t border-[#EEF2F7]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Heading */}
+        <div className="text-center mb-8">
+          <h2 className="font-display font-bold text-[22px] sm:text-[26px] text-[#0D1B2A]">
+            Care Options for Every Family
           </h2>
-          <p className="mt-4 max-w-xl text-[17px] leading-relaxed text-secondary-ink">
-            From sniffles to scheduled checkups — every service is delivered by a board-certified Nurse Practitioner, in the comfort of your home.
+          <p className="mt-1.5 text-[14px] text-[#4A6580]">
+            Comprehensive pediatric care designed around your needs.
           </p>
         </div>
-        <Link
-          to="/services"
-          className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-lift"
-        >
-          View all services <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
 
-      {/* Featured service */}
-      <article className="mt-12 grid overflow-hidden rounded-3xl border border-border bg-white shadow-soft transition-all hover:shadow-lift lg:grid-cols-12">
-        <div className="relative lg:col-span-6">
-          <img
-            src={serviceFeaturedImage}
-            alt="Nurse practitioner examining a toddler at home"
-            loading="lazy"
-            width={1024}
-            height={1024}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute left-5 top-5 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-soft">
-            <Star className="h-3 w-3 fill-primary text-primary" /> {featured.tag}
-          </div>
-        </div>
-        <div className="flex flex-col justify-between p-8 lg:col-span-6 lg:p-12">
-          <div>
-            <div className="flex items-center gap-3">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[#FEF3C7]">
-                <featured.icon className="h-5 w-5 text-[#B45309]" />
-              </span>
-              <div className="flex items-center gap-2 text-xs font-medium text-secondary-ink">
-                <Clock className="h-3.5 w-3.5" /> {featured.duration}
+        {/* Carousel */}
+        <div className="relative flex items-center gap-3">
+          {/* Left arrow */}
+          <button
+            onClick={() => canPrev && setStart(start - 1)}
+            disabled={!canPrev}
+            className="shrink-0 h-9 w-9 rounded-full border border-[#D6E4F0] bg-white shadow-sm flex items-center justify-center disabled:opacity-25 hover:border-[#1B6CA8] hover:text-[#1B6CA8] transition-colors"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          {/* Cards */}
+          <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {CARE_OPTIONS.slice(start, start + perPage).map((c) => (
+              <div
+                key={c.title}
+                className="border border-[#E8EFF7] rounded-xl p-5 bg-white hover:shadow-md hover:border-[#C8D8EC] transition-all cursor-pointer group text-center flex flex-col items-center"
+              >
+                {/* Circle icon */}
+                <span
+                  className="inline-flex h-[60px] w-[60px] items-center justify-center rounded-full"
+                  style={{ backgroundColor: c.bg }}
+                >
+                  <c.icon className="h-7 w-7" style={{ color: c.color }} />
+                </span>
+
+                {/* Title + badge */}
+                <div className="mt-3 flex items-center justify-center gap-1.5 flex-wrap">
+                  <h3 className="font-bold text-[13px] text-[#0D1B2A] leading-snug">{c.title}</h3>
+                  {c.badge && (
+                    <span className="bg-[#D52B1E] text-white text-[8px] font-extrabold px-1.5 py-[2px] rounded-sm tracking-wide">
+                      {c.badge}
+                    </span>
+                  )}
+                </div>
+
+                {/* Description */}
+                <p className="mt-2 text-[12px] text-[#4A6580] leading-snug flex-1">{c.desc}</p>
+
+                {/* Learn more */}
+                <Link
+                  to="/services"
+                  className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-[#1B6CA8] group-hover:gap-2 transition-all"
+                >
+                  Learn more <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
-            </div>
-            <h3 className="mt-5 font-display text-3xl font-bold leading-tight text-foreground">{featured.title}</h3>
-            <p className="mt-3 text-[15px] leading-relaxed text-secondary-ink">{featured.desc}</p>
-            <ul className="mt-6 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-              {featured.features.map((f) => (
-                <li key={f} className="flex items-start gap-2 text-sm text-foreground">
-                  <span className="mt-0.5 inline-flex h-4 w-4 flex-none items-center justify-center rounded-full bg-primary/10">
-                    <Check className="h-2.5 w-2.5 text-primary" strokeWidth={3} />
+            ))}
+          </div>
+
+          {/* Right arrow */}
+          <button
+            onClick={() => canNext && setStart(start + 1)}
+            disabled={!canNext}
+            className="shrink-0 h-9 w-9 rounded-full border border-[#D6E4F0] bg-white shadow-sm flex items-center justify-center disabled:opacity-25 hover:border-[#1B6CA8] hover:text-[#1B6CA8] transition-colors"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   TELEMEDICINE SECTION  (#7)
+════════════════════════════════════════════════════════ */
+function TelemedicineSection() {
+  return (
+    <section className="bg-[#0D1B2A] py-14 overflow-hidden relative">
+      {/* Background glow */}
+      <div className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-[#1B6CA8]/20 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-[#2ECC8B]/10 blur-3xl pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="grid lg:grid-cols-2 gap-10 items-center">
+
+          {/* Left */}
+          <div>
+            <span className="inline-flex items-center gap-1.5 bg-white/10 text-white text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-4 border border-white/15">
+              <Video className="h-3 w-3 text-[#2ECC8B]" /> Virtual Care
+            </span>
+            <h2 className="font-display font-bold text-[26px] sm:text-[32px] text-white leading-tight">
+              See a Pediatric NP<br />
+              <span className="text-[#2ECC8B]">from Anywhere in Ontario</span>
+            </h2>
+            <p className="mt-4 text-[14px] text-white/70 leading-relaxed max-w-lg">
+              No travel. No waiting rooms. Connect via secure video with a board-certified Nurse Practitioner for non-emergency concerns — from any device, any time.
+            </p>
+            <ul className="mt-6 space-y-3">
+              {[
+                "Available 7AM – 10PM, 7 days a week",
+                "PHIPA-compliant encrypted video",
+                "Prescriptions issued when appropriate",
+                "Lab referrals & follow-up included",
+                "Available province-wide in Ontario",
+              ].map((f) => (
+                <li key={f} className="flex items-center gap-3 text-[13px] text-white/80">
+                  <span className="h-5 w-5 rounded-full bg-[#2ECC8B]/20 border border-[#2ECC8B]/40 flex items-center justify-center shrink-0">
+                    <Check className="h-3 w-3 text-[#2ECC8B]" />
                   </span>
                   {f}
                 </li>
               ))}
             </ul>
-          </div>
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6">
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-secondary-ink">Starting at</div>
-              <div className="font-display text-2xl font-bold text-foreground">{featured.price}</div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Link to="/services" className="text-sm font-semibold text-primary hover:underline">
-                Learn more
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link to="/book" className="inline-flex items-center gap-2 bg-[#2ECC8B] text-[#0D1B2A] font-bold px-6 py-3 rounded-full hover:bg-[#27b87c] transition-colors shadow-lg">
+                <Video className="h-4 w-4" /> Start a Virtual Visit
               </Link>
-              <Link
-                to="/book"
-                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-lift"
-              >
-                Book now <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      {/* Supporting services grid */}
-      <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((s) => (
-          <article
-            key={s.title}
-            className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lift"
-          >
-            <span
-              aria-hidden
-              className="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100"
-              style={{ background: `linear-gradient(90deg, ${s.accent}, var(--primary))` }}
-            />
-            <div className="flex items-start justify-between">
-              <span
-                className="inline-flex h-11 w-11 items-center justify-center rounded-xl"
-                style={{ backgroundColor: s.accentBg }}
-              >
-                <s.icon className="h-5 w-5" style={{ color: s.accent }} />
-              </span>
-              <div className="flex items-center gap-1.5 text-[11px] font-medium text-secondary-ink">
-                <Clock className="h-3 w-3" /> {s.duration}
-              </div>
-            </div>
-            <h3 className="mt-5 font-display text-xl font-bold text-foreground">{s.title}</h3>
-            <p className="mt-2 flex-1 text-[14px] leading-relaxed text-secondary-ink">{s.desc}</p>
-            <div className="mt-6 flex items-end justify-between border-t border-border pt-4">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-secondary-ink">From</div>
-                <div className="font-display text-lg font-bold text-foreground">{s.price.replace("From ", "")}</div>
-              </div>
-              <Link
-                to="/services"
-                className="inline-flex items-center gap-1 text-sm font-semibold text-primary transition-all group-hover:gap-2"
-              >
+              <Link to="/services" className="inline-flex items-center gap-2 border border-white/20 text-white font-semibold px-6 py-3 rounded-full hover:bg-white/10 transition-colors">
                 Learn more <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-          </article>
-        ))}
-      </div>
-
-      {/* Trust strip */}
-      <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 rounded-2xl border border-border bg-white px-6 py-5 text-sm text-secondary-ink">
-        <div className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-primary" /> PHIPA compliant</div>
-        <div className="hidden h-4 w-px bg-border sm:block" />
-        <div className="flex items-center gap-2"><UserCheck className="h-4 w-4 text-primary" /> Board-certified NPs</div>
-        <div className="hidden h-4 w-px bg-border sm:block" />
-        <div className="flex items-center gap-2"><CreditCard className="h-4 w-4 text-primary" /> Insurance receipts provided</div>
-        <div className="hidden h-4 w-px bg-border sm:block" />
-        <div className="flex items-center gap-2"><CalendarCheck className="h-4 w-4 text-primary" /> Same-day booking</div>
-      </div>
-    </Section>
-  );
-}
-
-/* ──────────────────────────── LOCATIONS ──────────────────────────── */
-
-const CITIES = ["Milton", "Halton Hills", "Hamilton", "Oakville", "Mississauga", "Burlington", "Brampton"];
-
-function Locations() {
-  const cityData = [
-    { name: "Mississauga", nps: 9, eta: "65 min", x: "58%", y: "52%", featured: true },
-    { name: "Brampton", nps: 7, eta: "75 min", x: "50%", y: "32%" },
-    { name: "Oakville", nps: 7, eta: "70 min", x: "44%", y: "58%" },
-    { name: "Burlington", nps: 6, eta: "80 min", x: "34%", y: "62%" },
-    { name: "Milton", nps: 6, eta: "85 min", x: "32%", y: "46%" },
-    { name: "Hamilton", nps: 8, eta: "90 min", x: "20%", y: "68%" },
-    { name: "Halton Hills", nps: 5, eta: "95 min", x: "24%", y: "30%" },
-  ];
-  const [activeCity, setActiveCity] = useState(cityData[0].name);
-  const active = cityData.find((c) => c.name === activeCity)!;
-  return (
-    <Section bg="#FFFFFF">
-      <div className="flex flex-col items-start gap-8 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-2xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-[#F4F8FF] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-            <MapPin className="h-3 w-3" /> Where we serve
-          </span>
-          <h2 className="mt-5 font-display text-4xl font-bold leading-[1.05] text-foreground sm:text-5xl">
-            Across Ontario, <span className="text-primary">close to home</span>.
-          </h2>
-          <p className="mt-4 max-w-xl text-[17px] leading-relaxed text-secondary-ink">
-            7 cities. 48+ Nurse Practitioners on call. Tap a city to see live availability and average arrival time.
-          </p>
-        </div>
-        <div className="flex items-center gap-6">
-          <div>
-            <div className="font-display text-3xl font-bold text-foreground">7</div>
-            <div className="text-xs uppercase tracking-wider text-secondary-ink">Cities live</div>
+            <p className="mt-4 text-[11px] text-white/40">From $49 · No insurance required · Receipt provided</p>
           </div>
-          <div className="h-10 w-px bg-border" />
-          <div>
-            <div className="font-display text-3xl font-bold text-foreground">48+</div>
-            <div className="text-xs uppercase tracking-wider text-secondary-ink">NPs on call</div>
-          </div>
-          <div className="h-10 w-px bg-border" />
-          <div>
-            <div className="font-display text-3xl font-bold text-foreground">&lt;3<span className="text-base">h</span></div>
-            <div className="text-xs uppercase tracking-wider text-secondary-ink">Avg arrival</div>
-          </div>
-        </div>
-      </div>
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-12">
-        {/* Interactive map */}
-        <div className="lg:col-span-7">
-          <div
-            className="relative h-[460px] overflow-hidden rounded-3xl border border-border"
-            style={{
-              background:
-                "radial-gradient(120% 80% at 50% 0%, #EAF2FB 0%, #DCE8F5 60%, #CFE0F1 100%)",
-            }}
-          >
-            {/* Map texture */}
-            <svg className="absolute inset-0 h-full w-full opacity-[0.18]" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
-                  <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#1B6CA8" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#grid)" />
-            </svg>
-            {/* Stylized lake silhouette */}
-            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-              <path d="M0,80 Q15,72 28,78 T55,82 T82,76 L100,82 L100,100 L0,100 Z" fill="#1B6CA8" opacity="0.12" />
-              <path d="M0,84 Q20,78 40,84 T80,82 L100,86 L100,100 L0,100 Z" fill="#1B6CA8" opacity="0.18" />
-            </svg>
-            <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-primary shadow-soft backdrop-blur">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2ECC8B]" /> Live service area
-            </div>
-            <div className="absolute bottom-5 left-5 text-[10px] font-medium uppercase tracking-wider text-primary/60">
-              Southern Ontario · GTHA
-            </div>
-            {/* City pins */}
-            {cityData.map((d) => {
-              const isActive = d.name === activeCity;
-              return (
-                <button
-                  key={d.name}
-                  type="button"
-                  onClick={() => setActiveCity(d.name)}
-                  aria-label={`Show ${d.name} details`}
-                  className="group absolute -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: d.x, top: d.y }}
-                >
-                  <span className="relative flex h-4 w-4 items-center justify-center">
-                    {isActive && (
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/40" />
-                    )}
-                    <span
-                      className={`relative inline-flex h-3 w-3 rounded-full ring-4 transition-all ${
-                        isActive
-                          ? "bg-primary ring-white shadow-lift scale-125"
-                          : "bg-white ring-primary/70 group-hover:scale-110"
-                      }`}
-                    />
-                  </span>
-                  <span
-                    className={`mt-2 inline-block rounded-md px-2 py-0.5 text-[10px] font-semibold shadow-soft transition-all ${
-                      isActive ? "bg-primary text-white" : "bg-white text-primary"
-                    }`}
-                  >
-                    {d.name}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* City panel + list */}
-        <div className="lg:col-span-5 flex flex-col gap-5">
-          {/* Active city card */}
-          <div className="rounded-3xl border border-border bg-white p-7 shadow-soft">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-semibold text-[#047857]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#2ECC8B]" /> Accepting bookings
-                </div>
-                <h3 className="mt-3 font-display text-3xl font-bold text-foreground">{active.name}</h3>
-                <p className="text-sm text-secondary-ink">Ontario, Canada</p>
-              </div>
-              {active.featured && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                  <Star className="h-3 w-3 fill-primary" /> Largest team
+          {/* Right — feature cards */}
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { icon: Clock,       title: "Seen in minutes",  desc: "Average wait under 10 min during peak hours" },
+              { icon: ShieldCheck, title: "100% Secure",      desc: "End-to-end encrypted. PHIPA compliant always" },
+              { icon: Brain,       title: "AI-Assisted",      desc: "Symptom checker helps prepare before your visit" },
+              { icon: Heart,       title: "Kid-Friendly",     desc: "Pediatric specialists who make kids comfortable" },
+            ].map((f) => (
+              <div key={f.title} className="bg-white/8 border border-white/10 rounded-2xl p-5 hover:bg-white/12 transition-colors">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 mb-3">
+                  <f.icon className="h-5 w-5 text-[#2ECC8B]" />
                 </span>
-              )}
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-4 border-t border-border pt-5">
-              <div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-secondary-ink">
-                  <UserCheck className="h-3 w-3" /> NPs on team
-                </div>
-                <div className="mt-1 font-display text-2xl font-bold text-foreground">{active.nps}</div>
+                <p className="font-bold text-[13px] text-white">{f.title}</p>
+                <p className="text-[12px] text-white/55 mt-1 leading-snug">{f.desc}</p>
               </div>
-              <div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-secondary-ink">
-                  <Clock className="h-3 w-3" /> Avg arrival
-                </div>
-                <div className="mt-1 font-display text-2xl font-bold text-foreground">{active.eta}</div>
-              </div>
-            </div>
-            <div className="mt-6 flex gap-2">
-              <Link
-                to="/book"
-                className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-lift"
-              >
-                Book in {active.name} <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                to="/locations/$city"
-                params={{ city: active.name.toLowerCase().replace(" ", "-") }}
-                className="inline-flex items-center justify-center rounded-full border border-border bg-white px-4 py-3 text-sm font-semibold text-foreground transition-all hover:border-primary hover:text-primary"
-              >
-                Details
-              </Link>
-            </div>
-          </div>
-
-          {/* City quick list */}
-          <div className="rounded-3xl border border-border bg-[#F8FAFC] p-3">
-            <div className="grid grid-cols-2 gap-1.5">
-              {cityData.map((c) => {
-                const isActive = c.name === activeCity;
-                return (
-                  <button
-                    key={c.name}
-                    type="button"
-                    onMouseEnter={() => setActiveCity(c.name)}
-                    onClick={() => setActiveCity(c.name)}
-                    className={`group flex items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm transition-all ${
-                      isActive
-                        ? "bg-white text-primary shadow-soft"
-                        : "text-foreground hover:bg-white/70"
-                    }`}
-                  >
-                    <span className="flex items-center gap-2 font-semibold">
-                      <MapPin className={`h-3.5 w-3.5 ${isActive ? "text-primary" : "text-secondary-ink"}`} />
-                      {c.name}
-                    </span>
-                    <span className="text-[11px] font-medium text-secondary-ink">{c.eta}</span>
-                  </button>
-                );
-              })}
-            </div>
+            ))}
           </div>
         </div>
       </div>
-
-      {/* Waitlist strip */}
-      <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-dashed border-primary/30 bg-[#F4F8FF] px-6 py-5 sm:flex-row">
-        <div className="flex items-center gap-3 text-sm text-foreground">
-          <MapPin className="h-4 w-4 text-primary" />
-          <span>
-            <span className="font-semibold">Outside our service area?</span>{" "}
-            <span className="text-secondary-ink">We're expanding across Ontario every month.</span>
-          </span>
-        </div>
-        <Link
-          to="/contact"
-          className="inline-flex items-center gap-1.5 rounded-full bg-white border border-primary/20 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-colors"
-        >
-          Join our waitlist <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
-    </Section>
+    </section>
   );
 }
 
-/* ──────────────────────────── SOCIAL PROOF ──────────────────────────── */
+/* ════════════════════════════════════════════════════════
+   LOCATIONS
+════════════════════════════════════════════════════════ */
+const LOCATION_DATA = [
+  { name: "Milton",   address: "789 Main St E, Milton, ON L9T 3Z3",                 hours: "Mon–Sun: 8AM – 10PM", img: heroToddler },
+  { name: "Oakville", address: "2200 Winston Park Dr, Oakville, ON L6H 5R7",        hours: "Mon–Sun: 8AM – 10PM", img: heroCheckup },
+  { name: "Hamilton", address: "255 John St S, Hamilton, ON L8P 3H1",               hours: "Mon–Sun: 8AM – 10PM", img: heroVaccine },
+  { name: "Halton",   address: "Multiple clinics across Burlington & Halton Hills",  hours: "Mon–Sun: 8AM – 10PM", img: heroImage   },
+];
 
-function SocialProof() {
-  const testimonials = [
-    {
-      quote: "Our NP arrived within 2 hours on a Sunday evening. My daughter had an ear infection and was in so much pain. She was treated right at home. I can't recommend this service enough.",
-      initials: "SM",
-      name: "Sarah M.",
-      city: "Milton, Ontario",
-    },
-    {
-      quote: "We used to spend 4 hours in the ER every time our son spiked a fever. Now we just book online and a nurse comes to us. It's changed our lives as parents.",
-      initials: "DK",
-      name: "David K.",
-      city: "Oakville, Ontario",
-    },
-    {
-      quote: "The vaccination visit was seamless, professional, and our toddler barely noticed. The NP was incredible with him. Worth every penny.",
-      initials: "PS",
-      name: "Priya S.",
-      city: "Hamilton, Ontario",
-    },
-  ];
-  const stats = [
-    { value: "2,400+", label: "Families served" },
-    { value: "4.9 ★", label: "Average rating" },
-    { value: "98%", label: "Would recommend us" },
-    { value: "< 3 hrs", label: "Average arrival time" },
-  ];
+/* GTA map pins — approximate screen positions as % */
+const GTA_PINS = [
+  { city: "Mississauga", x: 62, y: 48 },
+  { city: "Brampton",    x: 52, y: 30 },
+  { city: "Oakville",    x: 47, y: 58 },
+  { city: "Burlington",  x: 37, y: 65 },
+  { city: "Milton",      x: 30, y: 50 },
+  { city: "Hamilton",    x: 18, y: 72 },
+  { city: "Halton Hills",x: 28, y: 28 },
+];
+
+function LocationsSection() {
   return (
-    <section
-      className="relative overflow-hidden text-white py-20 lg:py-[110px]"
-      style={{ background: "radial-gradient(120% 80% at 0% 0%, #143257 0%, #0D1B2A 55%, #07111C 100%)" }}
-    >
-      {/* Decorative grid */}
-      <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.07]">
-        <defs>
-          <pattern id="proofgrid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#7CE8B6" strokeWidth="0.5" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#proofgrid)" />
-      </svg>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-32 -right-32 h-[480px] w-[480px] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(46,204,139,0.18) 0%, transparent 70%)" }}
-      />
+    <section className="bg-[#EEF4FB] py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-      <div className="container-page relative">
-        {/* Header band */}
-        <div className="grid items-end gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-7">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#7CE8B6] backdrop-blur">
-              <Sparkles className="h-3 w-3" /> What families say
-            </span>
-            <h2 className="mt-5 font-display font-bold text-[34px] sm:text-[46px] lg:text-[54px] leading-[1.05] text-white">
-              Trusted by Ontario families,<br />
-              <span style={{ color: "#7CE8B6" }}>night and day.</span>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="font-display font-bold text-[22px] sm:text-[26px] text-[#0D1B2A]">
+              Care Across the GTA
             </h2>
-            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-white/70">
-              Independently verified reviews from parents across Halton, Hamilton, and Peel — collected after every home visit.
+            <p className="mt-1 text-[14px] text-[#4A6580]">
+              Multiple convenient locations and home visit coverage.
             </p>
           </div>
-          <div className="lg:col-span-5">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-white/60">
-              <span className="inline-flex items-center gap-2"><BadgeCheck className="h-4 w-4 text-[#7CE8B6]" /> CNO-licensed NPs</span>
-              <span className="inline-flex items-center gap-2"><Lock className="h-4 w-4 text-[#7CE8B6]" /> PHIPA compliant</span>
-              <span className="inline-flex items-center gap-2"><Award className="h-4 w-4 text-[#7CE8B6]" /> 4.9★ Google reviews</span>
+          <Link to="/locations"
+            className="hidden sm:inline-flex items-center gap-2 text-[13px] font-semibold text-[#0D1B2A] bg-white border border-[#D6E4F0] px-4 py-2 rounded-full shadow-sm hover:border-[#1B6CA8] hover:text-[#1B6CA8] transition-colors">
+            <MapPin className="h-3.5 w-3.5" /> View All Locations
+          </Link>
+        </div>
+
+        {/* Cards + Map row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(4,1fr)_280px] gap-4 items-stretch">
+
+          {/* 4 Location cards */}
+          {LOCATION_DATA.map((loc) => (
+            <div key={loc.name}
+              className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group border border-[#E8EFF7] hover:border-[#B8D0E8] flex flex-col">
+
+              {/* Photo */}
+              <div className="relative overflow-hidden" style={{ height: 160 }}>
+                <img
+                  src={loc.img}
+                  alt={`Pediatric care in ${loc.name}`}
+                  className="w-full h-full object-cover object-center group-hover:scale-[1.04] transition-transform duration-500"
+                />
+              </div>
+
+              {/* Body */}
+              <div className="p-5 flex flex-col flex-1">
+                <h3 className="font-display font-bold text-[16px] text-[#0D1B2A]">{loc.name}</h3>
+                <p className="text-[12px] text-[#4A6580] mt-1.5 leading-relaxed flex-1">{loc.address}</p>
+                <p className="text-[12px] text-[#4A6580] mt-2">{loc.hours}</p>
+                <Link to="/book"
+                  className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-bold text-[#1B6CA8] hover:gap-3 transition-all">
+                  Book Now <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          ))}
+
+          {/* Map panel */}
+          <div className="hidden lg:flex flex-col rounded-2xl overflow-hidden shadow-sm border border-[#D6E4F0] bg-[#1a2f4e]" style={{ minHeight: 380 }}>
+
+            {/* SVG illustrated GTA map */}
+            <div className="relative flex-1">
+              <svg viewBox="0 0 280 340" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full">
+                {/* Background */}
+                <rect width="280" height="340" fill="#1a2f4e" />
+
+                {/* Lake Ontario water */}
+                <path d="M0,240 Q40,228 80,234 Q130,240 180,232 Q220,226 260,234 Q270,236 280,238 L280,340 L0,340 Z" fill="#142640" />
+                <path d="M0,252 Q50,244 100,250 Q150,256 200,248 Q240,243 280,250 L280,340 L0,340 Z" fill="#0f1e30" opacity="0.7" />
+
+                {/* Shoreline glow */}
+                <path d="M0,238 Q60,228 120,234 Q180,240 240,232 Q260,229 280,232" fill="none" stroke="#2d5a8e" strokeWidth="1.5" opacity="0.6" />
+
+                {/* GTA region fill */}
+                <path d="M40,80 Q70,60 110,55 Q155,48 195,60 Q225,70 245,100 Q258,125 252,160 Q244,195 220,220 Q190,245 155,248 Q120,250 95,238 Q68,224 52,196 Q36,168 36,130 Q36,104 40,80 Z"
+                  fill="#1e3a5f" opacity="0.9" />
+
+                {/* Road network lines */}
+                <line x1="70" y1="55" x2="70" y2="245" stroke="#2a4a6e" strokeWidth="0.8" opacity="0.5" />
+                <line x1="110" y1="50" x2="110" y2="248" stroke="#2a4a6e" strokeWidth="0.8" opacity="0.5" />
+                <line x1="155" y1="48" x2="155" y2="250" stroke="#2a4a6e" strokeWidth="0.8" opacity="0.5" />
+                <line x1="200" y1="55" x2="200" y2="242" stroke="#2a4a6e" strokeWidth="0.8" opacity="0.5" />
+                <line x1="36" y1="120" x2="255" y2="120" stroke="#2a4a6e" strokeWidth="0.8" opacity="0.5" />
+                <line x1="36" y1="160" x2="252" y2="160" stroke="#2a4a6e" strokeWidth="0.8" opacity="0.5" />
+                <line x1="40" y1="200" x2="235" y2="200" stroke="#2a4a6e" strokeWidth="0.8" opacity="0.5" />
+
+                {/* City pins */}
+                {GTA_PINS.map((p) => {
+                  const cx = (p.x / 100) * 280;
+                  const cy = (p.y / 100) * 340;
+                  return (
+                    <g key={p.city}>
+                      {/* Pulse ring */}
+                      <circle cx={cx} cy={cy} r={9} fill="#C0392B" opacity="0.25" />
+                      {/* Pin body */}
+                      <circle cx={cx} cy={cy} r={6} fill="#E74C3C" />
+                      {/* Pin shine */}
+                      <circle cx={cx} cy={cy} r={2.5} fill="white" opacity="0.9" />
+                      {/* City label */}
+                      <text x={cx + 9} y={cy + 4} fontSize="7" fill="white" opacity="0.8" fontWeight="600">{p.city}</text>
+                    </g>
+                  );
+                })}
+              </svg>
+
+              {/* Live badge top */}
+              <div className="absolute top-3 left-3">
+                <span className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm text-white text-[10px] font-bold px-2.5 py-1.5 rounded-full border border-white/20">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2ECC8B] opacity-75" />
+                    <span className="relative h-1.5 w-1.5 rounded-full bg-[#2ECC8B]" />
+                  </span>
+                  Live Service Area
+                </span>
+              </div>
+            </div>
+
+            {/* View All bottom strip */}
+            <div className="px-4 py-3.5 bg-[#142640] border-t border-white/10">
+              <Link to="/locations"
+                className="flex items-center justify-center gap-2 text-white text-[12px] font-bold hover:text-[#2ECC8B] transition-colors">
+                <MapPin className="h-3.5 w-3.5" /> View All Locations
+              </Link>
             </div>
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
 
-        {/* Stats strip */}
-        <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-4">
-          {stats.map((s) => (
-            <div key={s.label} className="bg-[#0D1B2A] px-6 py-7">
-              <dt className="font-display font-extrabold text-3xl sm:text-4xl tracking-tight" style={{ color: "#7CE8B6" }}>
-                {s.value}
-              </dt>
-              <dd className="mt-2 text-[12px] uppercase tracking-[0.14em] text-white/55">{s.label}</dd>
+/* ════════════════════════════════════════════════════════
+   TRUST BADGES  (#8)
+════════════════════════════════════════════════════════ */
+function TrustBadges() {
+  const badges = [
+    { icon: ShieldCheck, label: "PHIPA Compliant",       sub: "Health data protection"    },
+    { icon: BadgeCheck,  label: "CNO Licensed NPs",      sub: "College of Nurses, Ontario" },
+    { icon: Lock,        label: "PCI-DSS Level 1",       sub: "Secure payment processing" },
+    { icon: Award,       label: "CPS-Aligned Protocols", sub: "Canadian Paediatric Society"},
+    { icon: ShieldCheck, label: "PIPEDA Compliant",      sub: "Privacy law compliant"     },
+    { icon: Star,        label: "4.9★ Google Verified",  sub: "2,400+ parent reviews"     },
+  ];
+  return (
+    <section className="bg-white py-10 border-t border-[#EEF2F7]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <p className="text-center text-[11px] font-extrabold uppercase tracking-widest text-[#4A6580] mb-7">
+          Trusted credentials &amp; compliance
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          {badges.map((b) => (
+            <div key={b.label} className="flex flex-col items-center text-center p-4 rounded-2xl border border-[#E8EFF7] bg-[#F7FAFE] hover:border-[#1B6CA8] hover:shadow-sm transition-all">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white border border-[#D6E4F0] shadow-sm mb-2.5">
+                <b.icon className="h-5 w-5 text-[#1B6CA8]" />
+              </span>
+              <p className="font-bold text-[12px] text-[#0D1B2A] leading-snug">{b.label}</p>
+              <p className="text-[11px] text-[#4A6580] mt-0.5">{b.sub}</p>
             </div>
-          ))}
-        </dl>
-
-        {/* Testimonial cards */}
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <article
-              key={t.name}
-              className="group relative flex flex-col rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#7CE8B6]/40"
-            >
-              <Quote
-                aria-hidden
-                className="absolute right-5 top-5 h-9 w-9 text-white/10 transition-colors group-hover:text-[#7CE8B6]/30"
-              />
-              <div className="flex gap-1 text-[#F5A623]">
-                {Array.from({ length: 5 }).map((_, k) => (
-                  <Star key={k} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <p className="mt-5 flex-1 text-[15px] leading-[1.7] text-white/85">
-                "{t.quote}"
-              </p>
-              <div className="mt-7 flex items-center gap-3 border-t border-white/10 pt-5">
-                <span
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold text-white shadow-soft"
-                  style={{ background: `linear-gradient(135deg, hsl(${(i * 60 + 200) % 360} 60% 45%), hsl(${(i * 60 + 240) % 360} 55% 35%))` }}
-                >
-                  {t.initials}
-                </span>
-                <div className="text-sm">
-                  <p className="font-semibold text-white">{t.name}</p>
-                  <p className="mt-0.5 text-white/55 text-[12px] inline-flex items-center gap-1.5">
-                    <MapPin className="h-3 w-3" />
-                    {t.city}
-                    <span className="mx-1 h-1 w-1 rounded-full bg-white/30" />
-                    <BadgeCheck className="h-3 w-3 text-[#7CE8B6]" />
-                    <span className="text-[#7CE8B6]">Verified</span>
-                  </p>
-                </div>
-              </div>
-            </article>
           ))}
         </div>
       </div>
@@ -868,427 +667,267 @@ function SocialProof() {
   );
 }
 
-/* ──────────────────────────── PRICING CALCULATOR ──────────────────────────── */
-
-const VISIT_TYPES = [
-  { id: "sick", label: "Sick Visit", price: 149 },
-  { id: "vacc", label: "Vaccination", price: 99 },
-  { id: "follow", label: "Follow-up", price: 119 },
-  { id: "well", label: "Well-child", price: 179 },
-  { id: "tele", label: "Telemedicine", price: 49 },
-];
-
-function PricingCalculator() {
-  const [city, setCity] = useState(CITIES[0]);
-  const [visitId, setVisitId] = useState("sick");
-  const [weekend, setWeekend] = useState(false);
-  const [urgent, setUrgent] = useState(false);
-
-  const visit = VISIT_TYPES.find((v) => v.id === visitId)!;
-  const base = visit.price;
-  const wk = weekend ? 25 : 0;
-  const ur = urgent ? 35 : 0;
-  const subtotal = base + wk + ur;
-  const hst = +(subtotal * 0.13).toFixed(2);
-  const total = +(subtotal + hst).toFixed(2);
-
-  return (
-    <Section bg="#F4F8FF">
-      <SectionHeading
-        label="TRANSPARENT PRICING"
-        title="Know your cost before you book."
-        subtitle="No hidden fees. No surprises. Just honest, upfront pricing — receipts included for benefits claims."
-      />
-
-      <div className="mt-14 grid gap-8 lg:grid-cols-12 lg:gap-10 items-stretch">
-        {/* LEFT: configurator */}
-        <div className="lg:col-span-7">
-          <div className="rounded-3xl border border-border bg-white p-7 sm:p-9 shadow-soft">
-            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" /> Build your estimate
-            </div>
-
-            <div className="mt-6 grid gap-5 sm:grid-cols-2">
-              <Field label="Select your city">
-                <div className="relative">
-                  <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary-ink" />
-                  <select
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-border bg-white pl-10 pr-9 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/15"
-                  >
-                    {CITIES.map((c) => <option key={c}>{c}</option>)}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary-ink" />
-                </div>
-              </Field>
-              <Field label="Visit type">
-                <div className="relative">
-                  <ClipboardCheck className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary-ink" />
-                  <select
-                    value={visitId}
-                    onChange={(e) => setVisitId(e.target.value)}
-                    className="w-full appearance-none rounded-xl border border-border bg-white pl-10 pr-9 py-3 text-sm font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/15"
-                  >
-                    {VISIT_TYPES.map((v) => <option key={v.id} value={v.id}>{v.label} — ${v.price}</option>)}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-secondary-ink" />
-                </div>
-              </Field>
-            </div>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div>
-                <span className="block text-xs font-semibold uppercase tracking-wider text-secondary-ink mb-2">Day</span>
-                <TogglePill leftLabel="Weekday" rightLabel="Weekend (+$25)" value={weekend} onChange={setWeekend} />
-              </div>
-              <div>
-                <span className="block text-xs font-semibold uppercase tracking-wider text-secondary-ink mb-2">Priority</span>
-                <TogglePill leftLabel="Standard" rightLabel="Urgent (+$35)" value={urgent} onChange={setUrgent} />
-              </div>
-            </div>
-
-            {/* Inclusions */}
-            <div className="mt-7 rounded-2xl bg-[#F4F8FF] p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">What's included</p>
-              <ul className="mt-3 grid gap-2 sm:grid-cols-2 text-[13px] text-foreground">
-                {[
-                  "Board-certified NP visit",
-                  "Full clinical assessment",
-                  "E-prescriptions when needed",
-                  "Written visit summary",
-                  "Pharmacy coordination",
-                  "Insurance-ready receipt",
-                ].map((it) => (
-                  <li key={it} className="flex items-start gap-2">
-                    <Check className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-[#2ECC8B]" />
-                    <span>{it}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT: invoice */}
-        <div className="lg:col-span-5">
-          <div className="sticky top-24 overflow-hidden rounded-3xl border border-border bg-white shadow-lift">
-            {/* Header */}
-            <div className="relative overflow-hidden px-7 py-6 text-white" style={{ background: "linear-gradient(135deg, #0D4A7A, #1B6CA8)" }}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">Live estimate</p>
-                  <p className="mt-1 font-display text-lg font-bold">{visit.label} · {city}</p>
-                </div>
-                <FileText className="h-6 w-6 text-white/60" />
-              </div>
-              <div className="mt-5 flex items-end justify-between">
-                <span className="text-sm text-white/70">Total today</span>
-                <span className="font-display font-extrabold text-[44px] tabular-nums leading-none">
-                  ${total.toFixed(2)}
-                </span>
-              </div>
-              <p className="mt-1 text-right text-[11px] text-white/55">HST included</p>
-            </div>
-
-            {/* Body */}
-            <div className="px-7 py-6">
-              <dl className="space-y-2.5 text-sm">
-                <Row label={`${visit.label} base fee`} value={`$${base.toFixed(2)}`} />
-                {weekend && <Row label="Weekend surcharge" value="+$25.00" />}
-                {urgent && <Row label="Urgent priority" value="+$35.00" />}
-                <div className="my-3 border-t border-dashed border-border" />
-                <Row label="Subtotal" value={`$${subtotal.toFixed(2)}`} />
-                <Row label="HST (13%)" value={`+$${hst.toFixed(2)}`} />
-              </dl>
-
-              <Link
-                to="/book"
-                className="mt-6 inline-flex h-[54px] w-full items-center justify-center gap-2 rounded-full text-base font-semibold text-white shadow-lift transition-transform hover:scale-[1.01] btn-press"
-                style={{ backgroundColor: "#E8471C" }}
-              >
-                Book at this price <ArrowRight className="h-5 w-5" />
-              </Link>
-
-              <div className="mt-5 flex flex-col gap-2 text-[12px] text-secondary-ink">
-                <span className="inline-flex items-center gap-1.5"><Lock className="h-3.5 w-3.5 text-primary" /> Secure Stripe payment · PCI-DSS Level 1</span>
-                <span className="inline-flex items-center gap-1.5"><FileText className="h-3.5 w-3.5 text-primary" /> Itemized receipt for benefits / HSA claims</span>
-                <span className="inline-flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-primary" /> Free cancellation up to 2 hours before visit</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block">
-      <span className="block text-xs font-semibold uppercase tracking-wider text-secondary-ink mb-2">{label}</span>
-      {children}
-    </label>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between text-foreground">
-      <dt className="text-secondary-ink">{label}</dt>
-      <dd className="font-semibold tabular-nums">{value}</dd>
-    </div>
-  );
-}
-
-function TogglePill({
-  leftLabel,
-  rightLabel,
-  value,
-  onChange,
-}: {
-  leftLabel: string;
-  rightLabel: string;
-  value: boolean;
-  onChange: (v: boolean) => void;
-}) {
-  return (
-    <div className="grid grid-cols-2 rounded-full border border-border bg-[#F4F8FF] p-1 text-xs font-semibold">
-      <button
-        type="button"
-        onClick={() => onChange(false)}
-        className={`rounded-full py-2 transition-colors ${!value ? "bg-primary text-white" : "text-secondary-ink"}`}
-      >
-        {leftLabel}
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange(true)}
-        className={`rounded-full py-2 transition-colors ${value ? "bg-primary text-white" : "text-secondary-ink"}`}
-      >
-        {rightLabel}
-      </button>
-    </div>
-  );
-}
-
-/* ──────────────────────────── WHY CHOOSE US ──────────────────────────── */
-
-function WhyChooseUs() {
-  const features = [
-    {
-      icon: BadgeCheck,
-      title: "Board-Certified Nurse Practitioners",
-      body: "Every NP is licensed by the College of Nurses of Ontario, fully insured, and background-checked annually.",
-      meta: "100% CNO-registered",
-    },
-    {
-      icon: Lock,
-      title: "PHIPA-Compliant Records",
-      body: "Encrypted end-to-end. Charts stored in Canadian data residency and shared only with your consent.",
-      meta: "Audited yearly",
-    },
-    {
-      icon: MapPin,
-      title: "Real-Time NP Tracking",
-      body: "Live ETA, NP profile, and arrival updates straight to your phone — like you'd expect from a modern service.",
-      meta: "Live in-app updates",
-    },
-    {
-      icon: Clock,
-      title: "Same-Day Appointments",
-      body: "Most bookings confirmed within 15 minutes. Average door-to-door arrival under 3 hours, 7 days a week.",
-      meta: "7 AM – 10 PM daily",
-    },
-    {
-      icon: CreditCard,
-      title: "Transparent Pricing",
-      body: "See the full price before you confirm. HST-inclusive receipts for extended health benefits and HSA claims.",
-      meta: "No hidden fees",
-    },
-    {
-      icon: ShieldCheck,
-      title: "Backed by Pediatricians",
-      body: "Our clinical advisory board reviews protocols quarterly to keep care aligned with Canadian Paediatric Society guidance.",
-      meta: "CPS-aligned protocols",
-    },
-  ];
-  return (
-    <Section bg="#FFFFFF">
-      <div className="grid items-end gap-8 lg:grid-cols-12">
-        <div className="lg:col-span-8">
-          <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-[#F4F8FF] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" /> Why Pediatric Urgent Care™
-          </span>
-          <h2 className="mt-5 font-display font-bold text-[32px] sm:text-[44px] lg:text-[52px] leading-[1.05] text-foreground">
-            Healthcare built around <span className="text-primary">your family's life</span>.
-          </h2>
-        </div>
-        <div className="lg:col-span-4">
-          <p className="text-[16px] text-secondary-ink leading-relaxed">
-            We know you're busy. We know the ER is stressful. We built a calmer, faster, and more accountable way to care for your child at home.
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-14 grid gap-px overflow-hidden rounded-3xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
-        {features.map((f) => (
-          <article
-            key={f.title}
-            className="group relative flex flex-col bg-white p-7 transition-colors hover:bg-[#F8FBFF]"
-          >
-            <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#E8F1FA] text-primary transition-transform group-hover:scale-105">
-              <f.icon className="h-5 w-5" />
-            </span>
-            <h3 className="mt-5 font-display text-[18px] font-bold leading-snug text-foreground">{f.title}</h3>
-            <p className="mt-2 text-[14px] leading-relaxed text-secondary-ink">{f.body}</p>
-            <p className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full bg-[#ECFDF5] px-2.5 py-1 text-[11px] font-semibold text-[#047857]">
-              <Check className="h-3 w-3" /> {f.meta}
-            </p>
-          </article>
-        ))}
-      </div>
-
-      {/* Compliance bar */}
-      <div className="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-border bg-[#F4F8FF] px-6 py-5 text-sm sm:flex-row">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-secondary-ink">
-          <span className="inline-flex items-center gap-2 font-semibold text-foreground">
-            <ShieldCheck className="h-4 w-4 text-primary" /> Trusted credentials:
-          </span>
-          <span>College of Nurses of Ontario</span>
-          <span className="hidden sm:inline text-border">·</span>
-          <span>PHIPA & PIPEDA</span>
-          <span className="hidden sm:inline text-border">·</span>
-          <span>Canadian Paediatric Society aligned</span>
-        </div>
-        <Link
-          to="/providers"
-          className="inline-flex items-center gap-1.5 rounded-full bg-white border border-primary/20 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary hover:text-white transition-colors"
-        >
-          Meet our NPs <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
-    </Section>
-  );
-}
-
-/* ──────────────────────────── FAQ ──────────────────────────── */
-
-const FAQS = [
+/* ════════════════════════════════════════════════════════
+   TESTIMONIALS  (#1)
+════════════════════════════════════════════════════════ */
+const TESTIMONIALS = [
   {
-    q: "What cities in Ontario do you serve?",
-    a: "We currently serve Milton, Halton Hills, Hamilton, Oakville, Mississauga, Burlington, and Brampton. We are expanding regularly — join our waitlist if you don't see your city.",
+    name: "Sarah M.",    city: "Milton",      initials: "SM", rating: 5,
+    quote: "Our NP arrived within 2 hours on a Sunday evening. My daughter had an ear infection and was treated right at home. I can't recommend this enough. The NP was so calm and gentle with her.",
   },
   {
-    q: "How quickly can a Nurse Practitioner arrive?",
-    a: "Most visits are confirmed within 15 minutes of booking. Average arrival time is 2–4 hours, with same-day availability in all cities.",
+    name: "David K.",    city: "Oakville",    initials: "DK", rating: 5,
+    quote: "We used to spend 4 hours in the ER every time our son spiked a fever. Now we just book online and a nurse comes to us within a few hours. It has genuinely changed our lives as parents.",
   },
   {
-    q: "Are your Nurse Practitioners licensed in Ontario?",
-    a: "Yes. All NPs are licensed with the College of Nurses of Ontario, fully insured, and background-checked.",
+    name: "Priya S.",    city: "Hamilton",    initials: "PS", rating: 5,
+    quote: "The vaccination visit was seamless and professional. Our toddler barely noticed. The NP was incredible with him. Worth every penny and we've already booked again.",
   },
   {
-    q: "Do you accept OHIP or private insurance?",
-    a: "Currently our visits are private pay. We provide official receipts that can be submitted to most extended health benefits plans for reimbursement.",
+    name: "Jordan R.",   city: "Burlington",  initials: "JR", rating: 5,
+    quote: "Booked at 9PM for a sick visit and the NP was at our door by 11PM. Diagnosis confirmed, prescription sent to the pharmacy. My son was sleeping comfortably by midnight.",
   },
   {
-    q: "How does payment work?",
-    a: "You pay securely online at the time of booking via credit or debit card through Stripe. A full receipt is emailed immediately.",
-  },
-  {
-    q: "Can I cancel or reschedule my booking?",
-    a: "Yes. Free cancellation or rescheduling is available up to 2 hours before your scheduled visit.",
-  },
-  {
-    q: "What if my child needs a prescription?",
-    a: "Ontario NPs have full prescribing authority. If a prescription is clinically appropriate, your NP can issue it directly during the visit.",
-  },
-  {
-    q: "Can I request the same NP for future visits?",
-    a: "Yes. Once you've had a great experience with an NP, you can request them for future bookings through your parent portal.",
+    name: "Mei L.",      city: "Mississauga", initials: "ML", rating: 5,
+    quote: "The follow-up care after my daughter's hospital visit was exceptional. The NP reviewed her records, checked in thoroughly, and gave us a written summary. True peace of mind.",
   },
 ];
 
-function FAQ() {
-  const [open, setOpen] = useState<number | null>(0);
+function Testimonials() {
+  const [idx, setIdx] = useState(0);
+  const visible = 3;
+  const total = TESTIMONIALS.length;
+  const prev = () => setIdx((i) => (i - 1 + total) % total);
+  const next = () => setIdx((i) => (i + 1) % total);
+  const shown = [0, 1, 2].map((offset) => TESTIMONIALS[(idx + offset) % total]);
+
   return (
-    <Section bg="#F4F8FF">
-      <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-        {/* Left rail */}
-        <aside className="lg:col-span-4">
-          <div className="sticky top-24">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-              <HelpCircle className="h-3 w-3" /> Common questions
+    <section className="bg-[#F7FAFE] py-14 border-t border-[#EEF2F7]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
+          <div>
+            <span className="inline-flex items-center gap-1.5 bg-[#E8F1FA] text-[#1B6CA8] text-[11px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full mb-3">
+              <Quote className="h-3 w-3" /> Parent Reviews
             </span>
-            <h2 className="mt-5 font-display font-bold text-[30px] sm:text-[40px] leading-[1.1] text-foreground">
-              Answers, before<br />you even ask.
+            <h2 className="font-display font-bold text-[24px] sm:text-[30px] text-[#0D1B2A]">
+              Trusted by Ontario Families
             </h2>
-            <p className="mt-4 text-[15px] leading-relaxed text-secondary-ink">
-              Real questions from Ontario parents — answered by our clinical team. Can't find what you're looking for?
+            <p className="mt-1.5 text-[14px] text-[#4A6580]">
+              Verified reviews from real parents after every visit.
             </p>
-            <div className="mt-6 rounded-2xl border border-border bg-white p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Still need help?</p>
-              <p className="mt-2 text-sm text-secondary-ink">Our care team responds 7 days a week.</p>
-              <div className="mt-4 flex flex-col gap-2">
-                <a
-                  href="tel:+19051234567"
-                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:opacity-95"
-                >
-                  <Phone className="h-3.5 w-3.5" /> (905) 123-4567
+          </div>
+          {/* Avg rating */}
+          <div className="flex items-center gap-3 bg-white border border-[#E8EFF7] rounded-2xl px-5 py-3 shadow-sm">
+            <div className="text-center">
+              <p className="font-display font-extrabold text-[28px] text-[#F5A623] leading-none">4.9</p>
+              <div className="flex gap-0.5 mt-1 justify-center">
+                {[...Array(5)].map((_, i) => <Star key={i} className="h-3 w-3 fill-[#F5A623] text-[#F5A623]" />)}
+              </div>
+            </div>
+            <div className="border-l border-[#E8EFF7] pl-3">
+              <p className="text-[12px] font-bold text-[#0D1B2A]">Google Rating</p>
+              <p className="text-[11px] text-[#4A6580]">2,400+ reviews</p>
+              <p className="text-[11px] text-[#2ECC8B] font-bold mt-0.5">✓ Verified</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {shown.map((t, i) => (
+            <div key={i} className="bg-white rounded-2xl border border-[#E8EFF7] p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+              {/* Stars */}
+              <div className="flex gap-0.5 mb-4">
+                {[...Array(t.rating)].map((_, k) => <Star key={k} className="h-4 w-4 fill-[#F5A623] text-[#F5A623]" />)}
+              </div>
+              {/* Quote */}
+              <p className="text-[13px] text-[#4A6580] leading-relaxed flex-1">"{t.quote}"</p>
+              {/* Author */}
+              <div className="mt-5 pt-4 border-t border-[#EEF2F7] flex items-center gap-3">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1B6CA8] text-white text-[12px] font-bold">
+                  {t.initials}
+                </span>
+                <div>
+                  <p className="text-[13px] font-bold text-[#0D1B2A]">{t.name}</p>
+                  <p className="text-[11px] text-[#4A6580] flex items-center gap-1">
+                    <MapPin className="h-3 w-3" /> {t.city}, Ontario
+                    <span className="ml-1 text-[#2ECC8B] font-bold">· Verified</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Navigation */}
+        <div className="mt-7 flex items-center justify-center gap-3">
+          <button onClick={prev} className="h-9 w-9 rounded-full border border-[#D6E4F0] bg-white flex items-center justify-center hover:border-[#1B6CA8] hover:text-[#1B6CA8] transition-colors shadow-sm">
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <div className="flex gap-1.5">
+            {TESTIMONIALS.map((_, i) => (
+              <button key={i} onClick={() => setIdx(i)}
+                className={`h-2 rounded-full transition-all ${i === idx ? "w-6 bg-[#1B6CA8]" : "w-2 bg-[#D6E4F0] hover:bg-[#B0C4D8]"}`} />
+            ))}
+          </div>
+          <button onClick={next} className="h-9 w-9 rounded-full border border-[#D6E4F0] bg-white flex items-center justify-center hover:border-[#1B6CA8] hover:text-[#1B6CA8] transition-colors shadow-sm">
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   BLOG PREVIEW  (#5)
+════════════════════════════════════════════════════════ */
+const BLOGS = [
+  {
+    tag: "Child Health",   tagColor: "#1B6CA8",
+    title: "When Should You Call a Pediatric NP vs. Go to the ER?",
+    excerpt: "Knowing the difference can save you hours of waiting and reduce unnecessary stress. Here's a parent-friendly guide to help you decide.",
+    date: "Nov 10, 2024",   readTime: "4 min read", img: heroCheckup,
+  },
+  {
+    tag: "Vaccinations",   tagColor: "#047857",
+    title: "Ontario's 2024–2025 Childhood Vaccination Schedule Explained",
+    excerpt: "Everything you need to know about the updated vaccine schedule, what's new, and how at-home vaccination visits work.",
+    date: "Nov 5, 2024",    readTime: "5 min read", img: heroVaccine,
+  },
+  {
+    tag: "Flu Season",     tagColor: "#B45309",
+    title: "5 Signs Your Child's Cold Has Turned Into Something More Serious",
+    excerpt: "Runny nose or something worse? A board-certified NP explains the warning signs parents should never ignore.",
+    date: "Oct 28, 2024",   readTime: "3 min read", img: heroToddler,
+  },
+];
+
+function BlogPreview() {
+  return (
+    <section className="bg-white py-14 border-t border-[#EEF2F7]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-end justify-between mb-9 flex-wrap gap-4">
+          <div>
+            <span className="inline-flex items-center gap-1.5 bg-[#E8F1FA] text-[#1B6CA8] text-[11px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full mb-3">
+              <TrendingUp className="h-3 w-3" /> Health Resources
+            </span>
+            <h2 className="font-display font-bold text-[24px] sm:text-[30px] text-[#0D1B2A]">
+              Tips from Our Clinical Team
+            </h2>
+            <p className="mt-1.5 text-[14px] text-[#4A6580]">Evidence-based pediatric health articles for Ontario parents.</p>
+          </div>
+          <Link to="/blog" className="inline-flex items-center gap-2 text-[13px] font-bold text-[#1B6CA8] border border-[#D6E4F0] px-4 py-2 rounded-full hover:border-[#1B6CA8] hover:bg-[#EEF4FB] transition-colors">
+            View all articles <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {BLOGS.map((b) => (
+            <Link to="/blog" key={b.title}
+              className="bg-white rounded-2xl border border-[#E8EFF7] overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group flex flex-col">
+              {/* Image */}
+              <div className="h-44 overflow-hidden">
+                <img src={b.img} alt={b.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              </div>
+              {/* Content */}
+              <div className="p-5 flex flex-col flex-1">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full text-white" style={{ backgroundColor: b.tagColor }}>
+                    {b.tag}
+                  </span>
+                  <span className="text-[11px] text-[#4A6580]">{b.readTime}</span>
+                </div>
+                <h3 className="font-display font-bold text-[15px] text-[#0D1B2A] leading-snug flex-1">{b.title}</h3>
+                <p className="mt-2 text-[12px] text-[#4A6580] leading-relaxed line-clamp-2">{b.excerpt}</p>
+                <div className="mt-4 pt-3 border-t border-[#EEF2F7] flex items-center justify-between">
+                  <span className="text-[11px] text-[#4A6580]">{b.date}</span>
+                  <span className="text-[12px] font-bold text-[#1B6CA8] group-hover:gap-2 flex items-center gap-1 transition-all">
+                    Read more <ArrowRight className="h-3.5 w-3.5" />
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ════════════════════════════════════════════════════════
+   FAQ SECTION  (#6)
+════════════════════════════════════════════════════════ */
+const FAQS = [
+  { q: "What cities in Ontario do you serve?",              a: "We currently serve Milton, Halton Hills, Hamilton, Oakville, Mississauga, Burlington, and Brampton. We are expanding monthly — join our waitlist if your city is not listed." },
+  { q: "How quickly can a Nurse Practitioner arrive?",      a: "Most visits are confirmed within 15 minutes of booking. Average arrival is 2–4 hours, with same-day availability across all cities, 7 days a week from 7AM to 10PM." },
+  { q: "Are your Nurse Practitioners licensed in Ontario?", a: "Yes. Every NP is fully licensed with the College of Nurses of Ontario (CNO), comprehensively insured, and background-checked annually before joining our team." },
+  { q: "Do you accept OHIP or private insurance?",          a: "Currently our visits are private-pay. We provide official itemized receipts that can be submitted to most extended health benefit plans and Health Spending Accounts (HSA)." },
+  { q: "Can NPs prescribe medications?",                    a: "Yes — Ontario NPs have full prescribing authority. If a prescription is clinically appropriate, your NP can issue it directly during the visit and send it to your pharmacy." },
+  { q: "Can I use Telemedicine for my child?",              a: "Absolutely. Virtual visits are available province-wide in Ontario for non-emergency concerns. From $49, available 7AM–10PM, 7 days a week from any device." },
+  { q: "What if I need to cancel or reschedule?",           a: "Free cancellation or rescheduling is available up to 2 hours before your scheduled visit. You can manage bookings directly from your Parent Portal account." },
+  { q: "Is my health data secure?",                         a: "Yes. All patient data is encrypted end-to-end, stored in Canadian data centres, and protected under PHIPA and PIPEDA. We undergo annual third-party security audits." },
+];
+
+function FAQSection() {
+  const [open, setOpen] = useState<number | null>(null);
+  const toggle = (i: number) => setOpen(open === i ? null : i);
+
+  return (
+    <section className="bg-[#F7FAFE] py-14 border-t border-[#EEF2F7]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-[380px_1fr] gap-12">
+
+          {/* Left sticky */}
+          <div className="lg:sticky lg:top-28 self-start">
+            <span className="inline-flex items-center gap-1.5 bg-[#E8F1FA] text-[#1B6CA8] text-[11px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full mb-4">
+              Common Questions
+            </span>
+            <h2 className="font-display font-bold text-[24px] sm:text-[30px] text-[#0D1B2A] leading-tight">
+              Answers Before<br />You Even Ask
+            </h2>
+            <p className="mt-3 text-[14px] text-[#4A6580] leading-relaxed">
+              Real questions from Ontario parents — answered by our clinical team.
+            </p>
+            {/* Contact box */}
+            <div className="mt-7 bg-white border border-[#E8EFF7] rounded-2xl p-5 shadow-sm">
+              <p className="text-[12px] font-bold text-[#0D1B2A] mb-1">Still have questions?</p>
+              <p className="text-[12px] text-[#4A6580] mb-4">Our care team responds 7 days a week.</p>
+              <div className="flex flex-col gap-2">
+                <a href="tel:+18335427227" className="inline-flex items-center gap-2 bg-[#1B6CA8] text-white text-[12px] font-bold px-4 py-2.5 rounded-xl hover:bg-[#155892] transition-colors">
+                  <Phone className="h-3.5 w-3.5" /> 1 (833) 543-7227
                 </a>
-                <a
-                  href="mailto:hello@pediatricurgentcare.ca"
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2.5 text-sm font-semibold text-foreground hover:border-primary hover:text-primary"
-                >
+                <Link to="/contact" className="inline-flex items-center gap-2 border border-[#D6E4F0] text-[#0D1B2A] text-[12px] font-semibold px-4 py-2.5 rounded-xl hover:border-[#1B6CA8] hover:text-[#1B6CA8] transition-colors">
                   <Mail className="h-3.5 w-3.5" /> Email our team
-                </a>
+                </Link>
               </div>
             </div>
           </div>
-        </aside>
 
-        {/* Accordion */}
-        <div className="lg:col-span-8">
-          <div className="overflow-hidden rounded-3xl border border-border bg-white shadow-soft divide-y divide-border">
+          {/* Accordion */}
+          <div className="space-y-2">
             {FAQS.map((f, i) => {
               const isOpen = open === i;
               return (
-                <div key={i} className={`transition-colors ${isOpen ? "bg-[#F8FBFF]" : "bg-white"}`}>
+                <div key={i} className={`rounded-2xl border transition-all duration-200 overflow-hidden ${isOpen ? "border-[#1B6CA8] bg-white shadow-sm" : "border-[#E8EFF7] bg-white hover:border-[#B8D0E8]"}`}>
                   <button
-                    type="button"
-                    onClick={() => setOpen(isOpen ? null : i)}
-                    aria-expanded={isOpen}
-                    className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
+                    onClick={() => toggle(i)}
+                    className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left"
                   >
-                    <span className="flex items-start gap-4">
-                      <span
-                        className={`mt-0.5 inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-[11px] font-bold tabular-nums transition-colors ${
-                          isOpen ? "bg-primary text-white" : "bg-[#E8F1FA] text-primary"
-                        }`}
-                      >
+                    <div className="flex items-center gap-3">
+                      <span className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold tabular-nums transition-colors
+                        ${isOpen ? "bg-[#1B6CA8] text-white" : "bg-[#EEF4FB] text-[#1B6CA8]"}`}>
                         {String(i + 1).padStart(2, "0")}
                       </span>
-                      <span className={`font-semibold text-[16px] leading-snug ${isOpen ? "text-primary" : "text-foreground"}`}>
+                      <span className={`font-semibold text-[14px] leading-snug ${isOpen ? "text-[#1B6CA8]" : "text-[#0D1B2A]"}`}>
                         {f.q}
                       </span>
-                    </span>
-                    <span
-                      className={`inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border transition-all ${
-                        isOpen
-                          ? "border-primary bg-primary text-white rotate-180"
-                          : "border-border bg-white text-secondary-ink"
-                      }`}
-                    >
+                    </div>
+                    <span className={`shrink-0 h-7 w-7 rounded-full border flex items-center justify-center transition-all ${isOpen ? "border-[#1B6CA8] bg-[#1B6CA8] text-white rotate-180" : "border-[#D6E4F0] bg-white text-[#4A6580]"}`}>
                       <ChevronDown className="h-4 w-4" />
                     </span>
                   </button>
-                  <div
-                    className="grid transition-all duration-300 ease-in-out"
-                    style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="px-6 pb-6 pl-[60px] text-[15px] text-secondary-ink leading-[1.7]">{f.a}</p>
-                    </div>
+                  <div className={`transition-all duration-300 ${isOpen ? "max-h-40 pb-5" : "max-h-0"} overflow-hidden`}>
+                    <p className="px-6 text-[13px] text-[#4A6580] leading-relaxed pl-[52px]">{f.a}</p>
                   </div>
                 </div>
               );
@@ -1296,105 +935,162 @@ function FAQ() {
           </div>
         </div>
       </div>
-    </Section>
+    </section>
   );
 }
 
-/* ──────────────────────────── FINAL CTA ──────────────────────────── */
-
-function FinalCTA() {
+/* ════════════════════════════════════════════════════════
+   WHY TRUST US — 5 icon pillars
+════════════════════════════════════════════════════════ */
+function WhyTrustUs() {
+  const pillars = [
+    { icon: Stethoscope, title: "Pediatric Experts",   desc: "Compassionate providers specializing in kids."        },
+    { icon: Clock,        title: "Fast & Convenient",   desc: "Same-day appointments and minimal wait times."         },
+    { icon: Brain,        title: "Advanced Technology", desc: "AI-powered tools for better care and experiences."     },
+    { icon: ShieldCheck,  title: "Secure & Private",    desc: "PHIPA-compliant and privacy focused."                  },
+    { icon: Star,         title: "Trusted by Families", desc: "Thousands of 5-star reviews from happy parents."       },
+  ];
   return (
-    <section className="relative overflow-hidden py-20 lg:py-[110px] text-white">
-      {/* Background */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(120deg, #0D4A7A 0%, #1B6CA8 50%, #0D4A7A 100%)" }}
-      />
-      <svg aria-hidden className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.08]">
-        <defs>
-          <pattern id="ctagrid" width="48" height="48" patternUnits="userSpaceOnUse">
-            <path d="M 48 0 L 0 0 0 48" fill="none" stroke="white" strokeWidth="0.6" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#ctagrid)" />
-      </svg>
-      <div
-        aria-hidden
-        className="absolute -bottom-32 -left-32 h-[500px] w-[500px] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(124,232,182,0.28) 0%, transparent 70%)" }}
-      />
-      <div
-        aria-hidden
-        className="absolute -top-32 -right-32 h-[420px] w-[420px] rounded-full blur-3xl"
-        style={{ background: "radial-gradient(circle, rgba(255,255,255,0.18) 0%, transparent 70%)" }}
-      />
+    <section className="bg-white border-t border-[#EEF2F7] py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="font-display font-bold text-[20px] sm:text-[22px] text-center text-[#0D1B2A] mb-8">
+          Why Parents Trust Pediatric Urgent Care™
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 text-center">
+          {pillars.map((p) => (
+            <div key={p.title} className="flex flex-col items-center gap-3 px-2">
+              <span className="inline-flex h-[56px] w-[56px] items-center justify-center rounded-full bg-[#EEF4FB] border border-[#E0EAF4]">
+                <p.icon className="h-6 w-6 text-[#1B6CA8]" />
+              </span>
+              <p className="font-bold text-[13px] text-[#0D1B2A] leading-snug">{p.title}</p>
+              <p className="text-[12px] text-[#4A6580] leading-snug">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-      <div className="container-page relative">
-        <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
-          <div className="lg:col-span-7">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/90 backdrop-blur">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#7CE8B6] animate-pulse" /> Now accepting bookings
-            </span>
-            <h2 className="mt-5 font-display font-bold text-[36px] sm:text-[52px] lg:text-[60px] leading-[1.02] text-white">
-              Your child deserves care<br />
-              <span style={{ color: "#7CE8B6" }}>without the wait.</span>
-            </h2>
-            <p className="mt-5 max-w-xl text-[16px] sm:text-[18px] leading-relaxed text-white/80">
-              Book a home visit today — a certified Nurse Practitioner at your door in hours, not days.
-            </p>
+/* ════════════════════════════════════════════════════════
+   PARENT PORTAL + AI CHECKER + EMERGENCY
+════════════════════════════════════════════════════════ */
+function ParentPortalSection() {
+  return (
+    <section className="bg-[#EEF4FB] py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-5">
 
-            <div className="mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-              <Link
-                to="/book"
-                className="inline-flex h-[56px] items-center justify-center gap-2 rounded-full bg-white px-7 text-[16px] font-semibold text-primary shadow-lift hover:scale-[1.02] btn-press transition-transform"
-              >
-                Book a home visit <ArrowRight className="h-5 w-5" />
-              </Link>
-              <a
-                href="tel:+19051234567"
-                className="inline-flex h-[56px] items-center justify-center gap-2 rounded-full border-2 border-white/70 bg-white/5 px-7 text-[16px] font-semibold text-white backdrop-blur hover:bg-white hover:text-primary btn-press transition-colors"
-              >
-                <Phone className="h-4 w-4" /> (905) 123-4567
-              </a>
+          {/* ── Left: Parent Portal dark card ── */}
+          <div className="bg-[#0D1B2A] rounded-2xl overflow-hidden flex min-h-[300px]">
+            {/* Text content */}
+            <div className="flex flex-col justify-center p-8 lg:p-10 flex-1">
+              <h2 className="font-display font-bold text-[22px] sm:text-[24px] text-white leading-tight">
+                Everything You Need in<br />One Parent Portal
+              </h2>
+              <ul className="mt-5 space-y-2.5">
+                {[
+                  "Manage your children's health records",
+                  "Track vaccinations & growth milestones",
+                  "Book appointments & home visits",
+                  "Securely store medical documents",
+                  "Get reminders & care recommendations",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2.5 text-[13px] text-white/85">
+                    <span className="h-5 w-5 rounded-full bg-[#2ECC8B]/20 border border-[#2ECC8B]/40 flex items-center justify-center shrink-0">
+                      <Check className="h-3 w-3 text-[#2ECC8B]" />
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              {/* App buttons */}
+              <div className="mt-7 flex items-center gap-3">
+                <a href="#" className="inline-flex items-center gap-2 bg-black border border-white/15 text-white px-3.5 py-2 rounded-xl hover:bg-[#111] transition-colors">
+                  <Smartphone className="h-5 w-5 shrink-0" />
+                  <div className="leading-tight">
+                    <p className="text-[9px] text-white/50 uppercase tracking-wide">Download on the</p>
+                    <p className="text-[12px] font-bold">App Store</p>
+                  </div>
+                </a>
+                <a href="#" className="inline-flex items-center gap-2 bg-black border border-white/15 text-white px-3.5 py-2 rounded-xl hover:bg-[#111] transition-colors">
+                  <Globe className="h-5 w-5 shrink-0" />
+                  <div className="leading-tight">
+                    <p className="text-[9px] text-white/50 uppercase tracking-wide">Get it on</p>
+                    <p className="text-[12px] font-bold">Google Play</p>
+                  </div>
+                </a>
+              </div>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-[13px] text-white/75">
-              <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4 text-[#7CE8B6]" /> 7 AM – 10 PM, 7 days a week</span>
-              <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-[#7CE8B6]" /> All Southern Ontario cities</span>
-              <span className="inline-flex items-center gap-2"><Lock className="h-4 w-4 text-[#7CE8B6]" /> PHIPA-secure booking</span>
+            {/* Phone mockup */}
+            <div className="hidden md:flex items-end justify-center px-6 pb-0 shrink-0 w-40">
+              <div className="w-[110px] h-[200px] bg-white rounded-t-[18px] border-t-[3px] border-x-[3px] border-[#1a3050] shadow-2xl overflow-hidden">
+                <div className="bg-[#F0F6FF] h-full p-2 space-y-1.5">
+                  <div className="bg-white rounded-lg p-2 shadow-sm">
+                    <p className="text-[7px] font-bold text-[#0D1B2A]">Hello, Sarah</p>
+                    <p className="text-[6px] text-[#4A6580]">My Children</p>
+                  </div>
+                  {[{ n: "Emma", a: "Age 7" }, { n: "Liam", a: "Age 4" }].map((c) => (
+                    <div key={c.n} className="bg-white rounded-lg p-1.5 shadow-sm flex items-center gap-1.5">
+                      <div className="h-5 w-5 rounded-full bg-[#E8F1FA] flex items-center justify-center shrink-0">
+                        <span className="text-[6px] font-bold text-[#1B6CA8]">{c.n[0]}</span>
+                      </div>
+                      <div>
+                        <p className="text-[6px] font-bold text-[#0D1B2A]">{c.n}</p>
+                        <p className="text-[5px] text-[#4A6580]">{c.a}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="bg-[#1B6CA8] rounded-lg p-2">
+                    <p className="text-[6px] font-bold text-white">Upcoming Appointment</p>
+                    <p className="text-[5px] text-white/70 mt-0.5">Nov 18 · 10:00 AM</p>
+                    <p className="text-[5px] text-white/70">Home Visit</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Right info card */}
-          <div className="lg:col-span-5">
-            <div className="rounded-3xl border border-white/15 bg-white/[0.07] p-7 backdrop-blur-md">
-              <div className="flex items-center gap-3">
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#7CE8B6]/15 text-[#7CE8B6]">
-                  <CalendarCheck className="h-5 w-5" />
-                </span>
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60">Average wait today</p>
-                  <p className="font-display text-2xl font-bold text-white">2h 14m to your door</p>
-                </div>
+          {/* ── Right: AI checker + Emergency ── */}
+          <div className="flex flex-col gap-4">
+
+            {/* AI Symptom Checker */}
+            <div className="bg-[#1B3464] rounded-2xl p-7 flex-1 flex gap-5 items-center">
+              <div className="flex-1">
+                <h3 className="font-display font-bold text-[20px] sm:text-[22px] text-white leading-snug">
+                  Not Sure What's Wrong?<br />
+                  <span className="text-white">Try our AI Symptom Checker</span>
+                </h3>
+                <p className="mt-3 text-[13px] text-white/70 leading-relaxed">
+                  Get instant, personalized guidance based on your child's symptoms.
+                </p>
+                <Link to="/symptom-checker"
+                  className="mt-5 inline-flex items-center gap-2 bg-white text-[#1B3464] text-[13px] font-bold px-6 py-2.5 rounded-full hover:bg-[#EEF4FB] transition-colors shadow-sm">
+                  Check Symptoms Now <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-              <div className="mt-6 grid grid-cols-3 gap-4 border-t border-white/15 pt-5 text-center">
-                <div>
-                  <p className="font-display text-2xl font-bold text-white">15<span className="text-base">min</span></p>
-                  <p className="mt-1 text-[10px] uppercase tracking-wider text-white/60">Avg booking confirm</p>
-                </div>
-                <div>
-                  <p className="font-display text-2xl font-bold text-white">48+</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-wider text-white/60">NPs on call</p>
-                </div>
-                <div>
-                  <p className="font-display text-2xl font-bold text-white">4.9★</p>
-                  <p className="mt-1 text-[10px] uppercase tracking-wider text-white/60">Parent rating</p>
-                </div>
+              {/* Robot icon */}
+              <div className="hidden sm:flex shrink-0 h-20 w-20 items-center justify-center rounded-2xl bg-white/10">
+                <Brain className="h-10 w-10 text-white/70" />
               </div>
-              <p className="mt-5 text-[12px] text-white/55 text-center">
-                Not a medical emergency? For life-threatening symptoms, call 911 immediately.
-              </p>
+            </div>
+
+            {/* Emergency */}
+            <div className="bg-white rounded-2xl border border-[#E8EFF7] p-5 flex items-center gap-4 shadow-sm">
+              <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-red-50">
+                <Phone className="h-5 w-5 text-red-500" />
+              </span>
+              <div className="flex-1">
+                <p className="text-[14px] font-bold text-[#0D1B2A]">Need immediate help?</p>
+                <p className="text-[12px] text-[#4A6580] mt-0.5 leading-snug">
+                  For life-threatening emergencies, call <strong className="text-[#0D1B2A]">911</strong> or go to your nearest emergency room.
+                </p>
+              </div>
+              <a href="tel:911"
+                className="shrink-0 inline-flex items-center gap-1.5 border-2 border-red-500 text-red-600 text-[13px] font-extrabold px-4 py-2 rounded-full hover:bg-red-500 hover:text-white transition-all">
+                <Phone className="h-3.5 w-3.5" /> 911
+              </a>
             </div>
           </div>
         </div>
@@ -1403,36 +1099,147 @@ function FinalCTA() {
   );
 }
 
-/* ──────────────────────────── SHARED ──────────────────────────── */
-
-function Section({ bg, children }: { bg: string; children: React.ReactNode }) {
+/* ════════════════════════════════════════════════════════
+   BOTTOM CTA BANNER
+════════════════════════════════════════════════════════ */
+function BottomCTASection() {
   return (
-    <section style={{ backgroundColor: bg }} className="py-16 lg:py-[100px]">
-      <div className="container-page">{children}</div>
+    <section className="bg-[#0D1B2A] py-7">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/10 border border-white/10">
+              <CalendarCheck className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <p className="font-display font-bold text-[18px] text-white">Ready to Book an Appointment?</p>
+              <p className="text-[13px] text-white/50 mt-0.5">Choose the care option that works best for your family.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <Link to="/book"
+              className="inline-flex items-center gap-2 bg-white text-[#0D1B2A] text-[13px] font-bold px-5 py-2.5 rounded-full hover:bg-[#EEF4FB] transition-colors shadow-sm">
+              Book a Visit <CalendarCheck className="h-4 w-4" />
+            </Link>
+            <Link to="/services"
+              className="inline-flex items-center gap-2 border border-white/20 text-white text-[13px] font-semibold px-5 py-2.5 rounded-full hover:bg-white/10 transition-colors">
+              Explore All Services <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
 
-function SectionHeading({
-  label,
-  title,
-  subtitle,
-  center,
-}: {
-  label?: string;
-  title: string;
-  subtitle?: string;
-  center?: boolean;
-}) {
+/* ════════════════════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════════════════════ */
+function SiteFooter() {
   return (
-    <div className={`max-w-2xl ${center ? "mx-auto text-center" : ""}`}>
-      {label && (
-        <p className="text-xs font-semibold tracking-[0.25em] text-primary">{label}</p>
-      )}
-      <h2 className="mt-3 font-display font-bold text-[30px] sm:text-[42px] leading-[1.1]">{title}</h2>
-      {subtitle && (
-        <p className="mt-4 text-base sm:text-lg text-secondary-ink leading-relaxed">{subtitle}</p>
-      )}
+    <footer className="bg-white border-t border-[#E8EFF7] pt-10 pb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-[180px_1fr_1fr_1fr_200px] gap-8">
+
+          {/* Brand */}
+          <div className="col-span-2 lg:col-span-1">
+            {/* Logo mark */}
+            <div className="flex items-center gap-2.5 mb-2">
+              <div className="h-10 w-10 rounded-xl bg-[#EEF4FB] border border-[#D6E4F0] flex items-center justify-center">
+                <Stethoscope className="h-5 w-5 text-[#1B6CA8]" />
+              </div>
+              <div className="leading-tight">
+                <p className="font-display font-extrabold text-[13px] text-[#0D1B2A]">Pediatric</p>
+                <p className="font-display font-extrabold text-[13px] text-[#1B6CA8]">Urgent Care™</p>
+              </div>
+            </div>
+            <p className="text-[11px] text-[#4A6580] mb-4 leading-snug">Here When Kids Need Us Most</p>
+            {/* Social icons */}
+            <div className="flex items-center gap-2">
+              {[Facebook, Instagram, Globe, Phone].map((Icon, i) => (
+                <a key={i} href="#"
+                  className="h-8 w-8 rounded-full border border-[#D6E4F0] flex items-center justify-center text-[#4A6580] hover:border-[#1B6CA8] hover:text-[#1B6CA8] transition-colors">
+                  <Icon className="h-3.5 w-3.5" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <FooterCol title="Quick Links" links={[
+            { label: "Services",     to: "/services"         },
+            { label: "Locations",    to: "/locations"        },
+            { label: "Telemedicine", to: "/services"         },
+            { label: "For Parents",  to: "/parent/dashboard" },
+            { label: "Resources",    to: "/blog"             },
+            { label: "About Us",     to: "/about"            },
+          ]} />
+
+          <FooterCol title="For Parents" links={[
+            { label: "Parent Portal",       to: "/parent/dashboard" },
+            { label: "AI Symptom Checker",  to: "/symptom-checker"  },
+            { label: "Vaccination Info",    to: "/services"         },
+            { label: "Forms & Documents",   to: "/parent/documents" },
+            { label: "Insurance & Billing", to: "/services"         },
+            { label: "FAQ",                 to: "/"                 },
+          ]} />
+
+          <FooterCol title="Support" links={[
+            { label: "Contact Us",    to: "/contact" },
+            { label: "Careers",       to: "/about"   },
+            { label: "Privacy Policy",to: "/privacy" },
+            { label: "Terms of Use",  to: "/terms"   },
+            { label: "Accessibility", to: "/about"   },
+          ]} />
+
+          {/* Contact */}
+          <div className="col-span-2 lg:col-span-1">
+            <div className="space-y-4">
+              <a href="tel:18335427227" className="flex items-start gap-3 group">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF4FB] border border-[#D6E4F0] group-hover:bg-[#1B6CA8] group-hover:border-[#1B6CA8] transition-colors">
+                  <Phone className="h-4 w-4 text-[#1B6CA8] group-hover:text-white transition-colors" />
+                </span>
+                <div>
+                  <p className="text-[13px] font-bold text-[#0D1B2A]">1 (833) 4-KIDS-CARE</p>
+                  <p className="text-[12px] text-[#4A6580]">(543-7227)</p>
+                </div>
+              </a>
+              <a href="mailto:info@pediatricurgentcare.ca" className="flex items-start gap-3 group">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF4FB] border border-[#D6E4F0] group-hover:bg-[#1B6CA8] group-hover:border-[#1B6CA8] transition-colors">
+                  <Mail className="h-4 w-4 text-[#1B6CA8] group-hover:text-white transition-colors" />
+                </span>
+                <div>
+                  <p className="text-[12px] text-[#4A6580] leading-snug">info@pediatricurgentcare.ca</p>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="mt-8 pt-5 border-t border-[#E8EFF7] flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-[11px] text-[#4A6580]">© 2024 Pediatric Urgent Care™. All rights reserved.</p>
+          <div className="flex items-center gap-3 text-[11px] text-[#4A6580]">
+            <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-[#2ECC8B]" />PHIPA Compliant</span>
+            <span className="text-[#D6E4F0]">•</span>
+            <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-[#2ECC8B]" />PIPEDA Compliant</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function FooterCol({ title, links }: { title: string; links: { label: string; to: string }[] }) {
+  return (
+    <div>
+      <p className="text-[11px] font-extrabold uppercase tracking-wider text-[#0D1B2A] mb-3.5">{title}</p>
+      <ul className="space-y-2">
+        {links.map((l) => (
+          <li key={l.label}>
+            <Link to={l.to} className="text-[13px] text-[#4A6580] hover:text-[#1B6CA8] transition-colors">{l.label}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

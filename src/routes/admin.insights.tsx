@@ -1,8 +1,9 @@
+// @refresh reset
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ComponentType } from "react";
 import {
   AlertTriangle, ArrowRight, Brain, DollarSign,
-  MapPin, RefreshCw, Route, Sparkles, TrendingUp, X,
+  MapPin, RefreshCw, Route as RouteIcon, Sparkles, TrendingUp, X,
 } from "lucide-react";
 import { PageHeader, Card, Badge, Btn } from "@/components/portal/PortalShell";
 
@@ -34,7 +35,7 @@ const INITIAL_INSIGHTS: {
     cta: "Launch Campaign", confidence: 95, ts: "1 hr ago", category: "Revenue",
   },
   {
-    id: 4, tone: "purple", icon: Route,
+    id: 4, tone: "purple", icon: RouteIcon,
     title: "Route consolidation · Brampton / Mississauga",
     body: "NPs in the Brampton–Mississauga corridor are averaging 28 min travel between visits. Geo-clustering bookings by postal zone could reduce travel time by ~35%, adding 2–3 extra visit slots daily.",
     cta: "Optimize Routes", confidence: 83, ts: "3 hr ago", category: "Logistics",

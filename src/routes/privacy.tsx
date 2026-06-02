@@ -1,3 +1,4 @@
+// @refresh reset
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Lock, Shield, FileText, Mail } from "lucide-react";
 
