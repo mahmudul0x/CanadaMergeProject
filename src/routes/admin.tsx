@@ -20,18 +20,18 @@ export const Route = createFileRoute("/admin")({ component: AdminLayout });
 
 const NAV: NavItem[] = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard, section: "Overview" },
-  { to: "/admin/insights", label: "AI Insights", icon: Sparkles, section: "Overview" },
+  { to: "/admin/insights",  label: "AI Insights",  icon: Sparkles,        section: "Overview", badge: 5, badgeTone: "info" },
 
-  { to: "/admin/appointments", label: "Appointments", icon: CalendarCheck, section: "Operations" },
-  { to: "/admin/users", label: "Patients & Families", icon: Users, section: "Operations" },
-  { to: "/admin/providers", label: "Nurse Practitioners", icon: Stethoscope, section: "Operations" },
+  { to: "/admin/appointments", label: "Appointments",        icon: CalendarCheck, section: "Operations", badge: 3, badgeTone: "warn" },
+  { to: "/admin/users",        label: "Patients & Families", icon: Users,          section: "Operations" },
+  { to: "/admin/providers",    label: "Nurse Practitioners", icon: Stethoscope,    section: "Operations" },
 
-  { to: "/admin/revenue", label: "Revenue", icon: DollarSign, section: "Finance & Reports" },
-  { to: "/admin/reports", label: "Reports", icon: FileBarChart, section: "Finance & Reports" },
+  { to: "/admin/revenue", label: "Revenue", icon: DollarSign,   section: "Finance & Reports" },
+  { to: "/admin/reports", label: "Reports",  icon: FileBarChart, section: "Finance & Reports" },
 
-  { to: "/admin/audit", label: "Audit Log", icon: ScrollText, section: "System" },
-  { to: "/admin/support", label: "Support", icon: LifeBuoy, section: "System" },
-  { to: "/admin/settings", label: "Settings", icon: Settings, section: "System" },
+  { to: "/admin/audit",    label: "Audit Log", icon: ScrollText, section: "System" },
+  { to: "/admin/support",  label: "Support",   icon: LifeBuoy,   section: "System", badge: 18, badgeTone: "bad" },
+  { to: "/admin/settings", label: "Settings",  icon: Settings,   section: "System" },
 ];
 
 function AdminLayout() {
@@ -54,21 +54,21 @@ function AdminLayout() {
       variant="dark"
       brand={
         <div className="flex items-center gap-2.5">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <ShieldCheck className="h-4 w-4" />
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow-[0_2px_8px_oklch(0.52_0.13_245/0.5)] shrink-0">
+            <ShieldCheck className="h-4.5 w-4.5" />
           </span>
-          <div className="leading-tight">
-            <p className="font-display font-extrabold text-sm text-white">Pediatric UC</p>
-            <p className="text-[10px] text-white/60 font-semibold uppercase tracking-wider">Admin Console</p>
+          <div className="leading-tight min-w-0">
+            <p className="font-display font-extrabold text-sm text-white leading-none">Pediatric UC</p>
+            <p className="text-[10px] text-white/50 font-bold uppercase tracking-[0.18em] mt-0.5">Admin Console</p>
           </div>
         </div>
       }
       subBrand={
         <div className="flex items-center gap-3">
-          <Avatar name={user.name} />
+          <Avatar name={user.name} size={36} />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold truncate text-white">{user.name}</p>
-            <Badge tone="info">Admin</Badge>
+            <p className="text-sm font-bold truncate text-white leading-tight">{user.name}</p>
+            <Badge tone="info">Super Admin</Badge>
           </div>
         </div>
       }

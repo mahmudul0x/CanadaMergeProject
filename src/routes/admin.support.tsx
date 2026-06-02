@@ -1,83 +1,153 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { LifeBuoy, MessageSquare, Clock, CheckCircle2, AlertCircle, Plus } from "lucide-react";
-import { PageHeader, Card, StatCard, Badge, Avatar } from "@/components/portal/PortalShell";
+import {
+  AlertCircle, CheckCircle2, Clock, MessageSquare,
+  Plus, Search, Star, TrendingUp,
+} from "lucide-react";
+import { PageHeader, Card, StatCard, Badge, Btn, Avatar } from "@/components/portal/PortalShell";
 
 export const Route = createFileRoute("/admin/support")({ component: AdminSupport });
 
-type Status = "Open" | "In Progress" | "Resolved" | "Escalated";
+/* ── Data ── */
 type Priority = "Low" | "Medium" | "High" | "Urgent";
+type TicketStatus = "Open" | "In Progress" | "Escalated" | "Resolved";
 
-const TICKETS: { id: string; subject: string; family: string; assignee: string; priority: Priority; status: Status; updated: string; messages: number }[] = [
-  { id: "TKT-4821", subject: "Cannot upload vaccination record (PDF)", family: "Sarah Mitchell", assignee: "Aria", priority: "Medium", status: "In Progress", updated: "12 min ago", messages: 4 },
-  { id: "TKT-4820", subject: "Wrong booking time confirmed", family: "James Brown", assignee: "Devon R.", priority: "High", status: "Open", updated: "28 min ago", messages: 2 },
-  { id: "TKT-4819", subject: "Refund request — duplicate charge", family: "Priya Patel", assignee: "Aria", priority: "Urgent", status: "Escalated", updated: "1h ago", messages: 6 },
-  { id: "TKT-4818", subject: "Add second child to account", family: "Ahmed Khan", assignee: "—", priority: "Low", status: "Open", updated: "3h ago", messages: 1 },
-  { id: "TKT-4817", subject: "Schedule recurring well-child visits", family: "Lucia Garcia", assignee: "Maya S.", priority: "Medium", status: "Resolved", updated: "Yesterday", messages: 5 },
-  { id: "TKT-4816", subject: "Insurance receipt for OHIP needed", family: "Min Lee", assignee: "Aria", priority: "Low", status: "Resolved", updated: "2 days ago", messages: 3 },
+const TICKETS: {
+  id: string; subject: string; family: string; assignee: string;
+  priority: Priority; status: TicketStatus; updated: string; messages: number; sla: string;
+}[] = [
+  { id: "TKT-0214", subject: "NP arrived 45 min late — requesting partial refund", family: "Thompson Family",  assignee: "Maya R.", priority: "High",   status: "In Progress", updated: "5 min ago",  messages: 4, sla: "2h 15m" },
+  { id: "TKT-0213", subject: "Unable to reschedule appointment online",            family: "Patel Family",    assignee: "James K.", priority: "Medium", status: "Open",        updated: "22 min ago", messages: 2, sla: "5h 40m" },
+  { id: "TKT-0212", subject: "Vaccination record not appearing in portal",         family: "Lin Family",      assignee: "Maya R.", priority: "Medium", status: "Open",        updated: "1h ago",     messages: 1, sla: "5h 00m" },
+  { id: "TKT-0211", subject: "Billing charge discrepancy — $47 overage",           family: "Reed Family",     assignee: "Sam T.",  priority: "High",   status: "Escalated",   updated: "2h ago",     messages: 7, sla: "0h 30m" },
+  { id: "TKT-0210", subject: "Request for PHIPA data export",                      family: "Shah Family",     assignee: "James K.", priority: "Urgent", status: "In Progress", updated: "3h ago",    messages: 3, sla: "1h 10m" },
+  { id: "TKT-0209", subject: "Positive feedback for NP A. Chen",                   family: "Nguyen Family",  assignee: "Sam T.",  priority: "Low",    status: "Resolved",    updated: "Yesterday",  messages: 2, sla: "—" },
 ];
 
-const TABS: Status[] = ["Open", "In Progress", "Escalated", "Resolved"];
+const TABS = ["All", "Open", "In Progress", "Escalated", "Resolved"] as const;
+type Tab = (typeof TABS)[number];
+
+const PRIORITY_TONE: Record<Priority, "neutral" | "info" | "warn" | "bad"> = {
+  Low: "neutral", Medium: "info", High: "warn", Urgent: "bad",
+};
+const STATUS_TONE: Record<TicketStatus, "warn" | "info" | "bad" | "good"> = {
+  Open: "warn", "In Progress": "info", Escalated: "bad", Resolved: "good",
+};
 
 function AdminSupport() {
-  const [tab, setTab] = useState<Status | "All">("All");
-  const filtered = tab === "All" ? TICKETS : TICKETS.filter(t => t.status === tab);
+  const [tab, setTab]     = useState<Tab>("All");
+  const [query, setQuery] = useState("");
+
+  const visible = TICKETS.filter((t) => {
+    if (tab !== "All" && t.status !== tab) return false;
+    if (query) {
+      const q = query.toLowerCase();
+      return [t.id, t.subject, t.family, t.assignee].some((f) => f.toLowerCase().includes(q));
+    }
+    return true;
+  });
 
   return (
-    <>
+    <div className="space-y-6">
       <PageHeader
+        breadcrumb="System"
         title="Support"
-        sub="Family tickets, escalations and team responses."
-        action={<button className="inline-flex items-center gap-2 rounded-lg bg-primary text-primary-foreground px-3 py-2 text-sm font-semibold hover:opacity-90"><Plus className="h-4 w-4" /> New Ticket</button>}
+        sub="Customer service tickets and family communications"
+        action={
+          <Btn variant="primary" size="sm"><Plus className="h-4 w-4" /> New Ticket</Btn>
+        }
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Open Tickets" value="18" delta="4 unassigned" tone="warn" icon={LifeBuoy} />
-        <StatCard label="Avg First Reply" value="14 min" delta="Target: 30 min" tone="good" icon={Clock} />
-        <StatCard label="Resolved (7d)" value="64" delta="+9 vs. last week" tone="good" icon={CheckCircle2} />
-        <StatCard label="CSAT" value="4.8 / 5" delta="223 ratings" tone="good" icon={MessageSquare} />
+      {/* KPIs */}
+      <div className="grid gap-4 grid-cols-2 xl:grid-cols-4">
+        <StatCard label="Open Tickets"      value="18"   delta="3 escalated"             icon={AlertCircle}   tone="warn" />
+        <StatCard label="Avg First Reply"   value="14m"  delta="SLA target: 30 min"      icon={Clock}         tone="good"    deltaUp />
+        <StatCard label="Resolved (7 days)" value="64"   delta="+8 vs last week"          icon={CheckCircle2}  tone="good"    deltaUp />
+        <StatCard label="CSAT Score"        value="4.8★" delta="+0.2 vs last month"       icon={Star}          tone="good"    deltaUp />
       </div>
 
-      <Card className="p-0 overflow-hidden">
-        <div className="flex items-center gap-1 bg-background rounded-lg p-1 m-4 w-fit">
-          {(["All", ...TABS] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)} className={`px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${tab === t ? "bg-surface shadow-soft text-primary" : "text-secondary-ink hover:text-foreground"}`}>{t}</button>
-          ))}
+      {/* Table */}
+      <Card noPad>
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b border-[oklch(0.91_0.025_240)]">
+          <div className="flex items-center gap-1 rounded-xl bg-[oklch(0.965_0.018_240)] p-1 border border-[oklch(0.91_0.025_240)]">
+            {TABS.map((t) => (
+              <button key={t} onClick={() => setTab(t)}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                  tab === t ? "bg-white text-foreground shadow-sm" : "text-[oklch(0.55_0.04_250)] hover:text-foreground"
+                }`}>
+                {t}
+                {t === "Escalated" && <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">3</span>}
+              </button>
+            ))}
+          </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[oklch(0.6_0.04_250)]" />
+            <input value={query} onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search tickets…"
+              className="w-56 rounded-xl border border-[oklch(0.91_0.025_240)] bg-[oklch(0.975_0.012_240)] pl-8 pr-3 py-2 text-xs outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition-all" />
+          </div>
         </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-background text-secondary-ink">
-              <tr className="text-left">
-                <th className="px-4 py-3 font-semibold">Ticket</th>
-                <th className="px-4 py-3 font-semibold">Family</th>
-                <th className="px-4 py-3 font-semibold">Assignee</th>
-                <th className="px-4 py-3 font-semibold">Priority</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
-                <th className="px-4 py-3 font-semibold text-right">Msgs</th>
-                <th className="px-4 py-3 font-semibold">Updated</th>
+            <thead>
+              <tr className="border-b border-[oklch(0.91_0.025_240)]">
+                {["Ticket", "Subject", "Family", "Assignee", "Priority", "Status", "SLA", "Updated", ""].map((h) => (
+                  <th key={h} className="py-3 px-4 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[oklch(0.55_0.04_250)] text-left whitespace-nowrap">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
-              {filtered.map(t => (
-                <tr key={t.id} className="hover:bg-background cursor-pointer">
-                  <td className="px-4 py-3">
-                    <div className="font-semibold">{t.subject}</div>
-                    <div className="text-xs text-secondary-ink font-mono">{t.id}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2"><Avatar name={t.family} size={28} /><span>{t.family}</span></div>
-                  </td>
-                  <td className="px-4 py-3">{t.assignee === "—" ? <span className="text-secondary-ink flex items-center gap-1 text-xs"><AlertCircle className="h-3 w-3" /> Unassigned</span> : t.assignee}</td>
-                  <td className="px-4 py-3"><Badge tone={t.priority === "Urgent" ? "bad" : t.priority === "High" ? "warn" : t.priority === "Medium" ? "info" : "neutral"}>{t.priority}</Badge></td>
-                  <td className="px-4 py-3"><Badge tone={t.status === "Resolved" ? "good" : t.status === "Escalated" ? "bad" : t.status === "In Progress" ? "info" : "warn"}>{t.status}</Badge></td>
-                  <td className="px-4 py-3 text-right tabular-nums">{t.messages}</td>
-                  <td className="px-4 py-3 text-secondary-ink text-xs">{t.updated}</td>
-                </tr>
-              ))}
+            <tbody>
+              {visible.map((t) => {
+                const slaUrgent = t.sla !== "—" && t.sla.startsWith("0h");
+                return (
+                  <tr key={t.id} className="border-b border-[oklch(0.94_0.018_240)] last:border-b-0 hover:bg-[oklch(0.975_0.012_240)] transition-colors">
+                    <td className="py-3.5 px-4">
+                      <p className="font-mono text-[11px] text-[oklch(0.55_0.04_250)]">{t.id}</p>
+                      <p className="text-[11px] text-[oklch(0.6_0.04_250)] flex items-center gap-0.5 mt-0.5">
+                        <MessageSquare className="h-3 w-3" /> {t.messages}
+                      </p>
+                    </td>
+                    <td className="py-3.5 px-4 max-w-56">
+                      <p className="font-semibold text-foreground truncate">{t.subject}</p>
+                    </td>
+                    <td className="py-3.5 px-4 text-sm text-[oklch(0.45_0.05_250)] whitespace-nowrap">{t.family}</td>
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-2">
+                        <Avatar name={t.assignee} size={26} />
+                        <span className="text-sm text-foreground whitespace-nowrap">{t.assignee}</span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4"><Badge tone={PRIORITY_TONE[t.priority]} dot>{t.priority}</Badge></td>
+                    <td className="py-3.5 px-4"><Badge tone={STATUS_TONE[t.status]} dot>{t.status}</Badge></td>
+                    <td className="py-3.5 px-4">
+                      <span className={`text-xs font-bold tabular-nums ${slaUrgent ? "text-red-600" : "text-[oklch(0.45_0.05_250)]"}`}>
+                        {t.sla}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-xs text-[oklch(0.55_0.04_250)] whitespace-nowrap">{t.updated}</td>
+                    <td className="py-3.5 px-4">
+                      <button className="text-xs font-semibold text-primary hover:text-[oklch(0.46_0.13_245)]">Open</button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {visible.length === 0 && (
+                <tr><td colSpan={9} className="py-16 text-center text-sm text-[oklch(0.55_0.04_250)]">No tickets match your filters.</td></tr>
+              )}
             </tbody>
           </table>
         </div>
+
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[oklch(0.91_0.025_240)]">
+          <p className="text-xs text-[oklch(0.55_0.04_250)]">Showing {visible.length} of {TICKETS.length} tickets</p>
+          <div className="flex items-center gap-1.5 text-xs text-[oklch(0.55_0.04_250)]">
+            <TrendingUp className="h-3.5 w-3.5 text-[oklch(0.42_0.18_150)]" />
+            Avg resolution time: <strong className="text-foreground ml-1">2h 18m</strong>
+          </div>
+        </div>
       </Card>
-    </>
+    </div>
   );
 }
