@@ -4,7 +4,7 @@
 // Netlify/SPA build route tree — uses __root.netlify.tsx (no SSR shell APIs).
 // Keep in sync with routeTree.gen.ts if routes change.
 
-import { Route as rootRouteImport } from './routes/__root.netlify'
+import { Route as rootRouteImport } from './__root.netlify'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SymptomCheckerRouteImport } from './routes/symptom-checker'
 import { Route as ServicesRouteImport } from './routes/services'

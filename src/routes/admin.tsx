@@ -13,7 +13,7 @@ import {
   ScrollText,
   LifeBuoy,
 } from "lucide-react";
-import { PortalShell, type NavItem, Avatar, Badge } from "@/components/portal/PortalShell";
+import { PortalShell, type NavItem } from "@/components/portal/PortalShell";
 import { usePortalAuth } from "@/lib/portal-auth";
 
 export const Route = createFileRoute("/admin")({ component: AdminLayout });
@@ -60,15 +60,6 @@ function AdminLayout() {
           <div className="leading-tight min-w-0">
             <p className="font-display font-extrabold text-sm text-white leading-none">Pediatric UC</p>
             <p className="text-[10px] text-white/50 font-bold uppercase tracking-[0.18em] mt-0.5">Admin Console</p>
-          </div>
-        </div>
-      }
-      subBrand={
-        <div className="flex items-center gap-3">
-          <Avatar name={user.name} size={36} />
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold truncate text-white leading-tight">{user.name}</p>
-            <Badge tone="info">Super Admin</Badge>
           </div>
         </div>
       }
